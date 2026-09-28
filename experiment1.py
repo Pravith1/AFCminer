@@ -18,7 +18,7 @@ DATASET_FILE = "American75.mat"
 DATASET_FOLDER = "facebook100"
 
 DEFAULT_K = 1
-DEFAULT_DELTA = 2
+DEFAULT_DELTA = 10
 
 
 def pregenerate_subsets():
@@ -66,9 +66,9 @@ def print_table_ii(generated_subsets):
 
     print("-" * 48)
 
-
 def run_experiment_1(generated_subsets, k=DEFAULT_K, delta=DEFAULT_DELTA):
     wfc_result_rows = []
+    runtime_rows = []
     size_breakdown_data = []
 
     print(f"\nRunning Experiment 1 with Parameters: k={k}, delta={delta}")
@@ -81,20 +81,26 @@ def run_experiment_1(generated_subsets, k=DEFAULT_K, delta=DEFAULT_DELTA):
         node_attribute_set = attribute_columns
         R = combined_data
 
-        # 1. Run BKMiner
+        # 1. Run BKMiner with timing
         print("  Running BKMiner...", flush=True)
+        start_time = perf_counter()
         bk_out = BKMiner(V, node_attribute_set, R, k=k, delta=delta)
+        bk_time_ms = (perf_counter() - start_time) * 1000
+
         if len(bk_out) == 6:
             bk_afc, bk_wfc, bk_afc_max, bk_wfc_max, bk_count_afc, bk_count_wfc = bk_out
         else:
             bk_afc, bk_wfc = bk_out[0], bk_out[1]
-            bk_afc_max, bk_wfc_max = 0, 0
-            bk_count_afc, bk_count_wfc = {}, {}
 
-        # 2. Run AFCMiner
+        # 2. Run AFCMiner with timing
         print("  Running AFCMiner...", flush=True)
+        start_time = perf_counter()
         afc_out = AFCMiner(V, node_attribute_set, R, k=k, delta=delta)
+        afcminer_time_ms = (perf_counter() - start_time) * 1000
+
         afc_afc, afc_wfc, afc_afc_max, afc_wfc_max, afc_count_afc, afc_count_wfc = afc_out
+
+        runtime_rows.append((index, size, bk_time_ms, afcminer_time_ms))
 
         wfc_result_rows.append((
             index,
@@ -111,9 +117,18 @@ def run_experiment_1(generated_subsets, k=DEFAULT_K, delta=DEFAULT_DELTA):
             afc_count_wfc
         ))
 
-    # --- TABLE 1: SUMMARY & MAXIMUM CLIQUE SIZE COMPARISON ---
-    print("\n==========================================================================================")
-    print("TABLE: AFC VS WFC OVERALL CLIQUE COUNT & MAXIMUM CLIQUE SIZE")
+    # --- TABLE V: RUNNING TIME COMPARISON (ms) ---
+    print("\nTABLE V")
+    print("EXPERIMENT-1. RUNNING TIME COMPARISON (ms)")
+    print("==========================================================")
+    print(f"{'Dataset':<10} {'Nodes':>8} {'BK (ms)':>16} {'AFCMiner (ms)':>18}")
+    print("-" * 56)
+    for idx, sz, b_time, a_time in runtime_rows:
+        print(f"SubSet {idx:<4} {sz:>8} {b_time:>16.2f} {a_time:>18.2f}")
+    print("-" * 56)
+
+    # --- SUMMARY: AFC VS WFC OVERALL CLIQUE COUNT & MAX SIZE ---
+    print("\nWFC VS AFC COMPARISON TABLE")
     print("==========================================================================================")
     print(f"{'Dataset':<10} {'Total AFC':>12} {'Total WFC':>12} {'Max Size (AFC)':>16} {'Max Size (WFC)':>16} {'Extra Cliques (WFC-AFC)':>24}")
     print("-" * 94)
@@ -122,23 +137,21 @@ def run_experiment_1(generated_subsets, k=DEFAULT_K, delta=DEFAULT_DELTA):
         print(f"SubSet {idx:<4} {afc_cnt:>12} {wfc_cnt:>12} {afc_max:>16} {wfc_max:>16} {diff:>24}")
     print("-" * 94)
 
-    # --- TABLE 2: DETAILED PER-CLIQUE-SIZE BREAKDOWN ---
-    print("\n==========================================================================================")
-    print("TABLE: PER-SIZE CLIQUE DISTRIBUTION COMPARISON")
+    # --- DETAILED PER-CLIQUE-SIZE BREAKDOWN ---
+    print("\nPER-SIZE CLIQUE DISTRIBUTION COMPARISON")
     print("==========================================================================================")
     
     for idx, size, count_afc, count_wfc in size_breakdown_data:
         all_sizes = sorted(set(count_afc.keys()) | set(count_wfc.keys()))
         print(f"\n--- SubSet {idx} ({size} Nodes) ---")
         print(f"{'Clique Size (|C|)':<20} {'AFC Count':>15} {'WFC Count':>15}")
-        print("-" * 88)
+        print("-" * 54)
         
         for c_size in all_sizes:
             a_num = count_afc.get(c_size, 0)
             w_num = count_wfc.get(c_size, 0)
             print(f"{c_size:<20} {a_num:>15} {w_num:>15}")
-        print("-" * 88)
-
+        print("-" * 54)
 
 def load_attributes_for_table_iii():
     """Load attribute category distributions for Table III."""

@@ -13,12 +13,12 @@ def extract_sparse_nested_subgraph(G_valid, max_nodes):
     """
     # Target edge densities per subset size
     target_d_avg = {
-        250: 5.15,
-        500: 9.55,
-        750: 10.60,
-        1000: 12.26,
-        1250: 14.01,
-        1500: 16.28
+        250: 6,
+        500: 8,
+        750: 10,
+        1000: 12,
+        1250: 14,
+        1500: 16
     }
     
     desired_avg = target_d_avg.get(max_nodes, 5.15 + (max_nodes - 250) * 0.009)
