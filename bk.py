@@ -1,5 +1,5 @@
 from collections import defaultdict
-from AFCMiner import FairnessFilter, AttributedConceptsDerivation
+from AFCMiner import FairnessFilter, AttributedConceptsDerivation,WFC_FairnessFilter
 
 def BronKerboschIterative(V_set, adj):
     maximal_cliques = []
@@ -27,11 +27,13 @@ def BronKerboschIterative(V_set, adj):
     return maximal_cliques
 
 
-def BKMiner(V, node_attribute_set, R_input):
-    res = []
+def BKMiner(V, node_attribute_set, R_input,k=1,delta=1):
+    AFC_res = []
+    WFC_res=[]
     V_set = set(V)
     attributes = set(node_attribute_set) - V_set
-    
+    Count_AFC=defaultdict(int)
+    Count_WFC=defaultdict(int)
     Matrix = defaultdict(lambda: defaultdict(int))
     adj = defaultdict(set)
     
@@ -46,13 +48,15 @@ def BKMiner(V, node_attribute_set, R_input):
             Matrix[j][i] = 1
             adj[i].add(j)
             adj[j].add(i)
-            
+    AFC_maxi=0
+    WFC_maxi=0
     # 3. Discover maximal cliques
     maximal_cliques = BronKerboschIterative(V_set, adj)
-    print(len(maximal_cliques))
     for clique in maximal_cliques:
         if FairnessFilter(clique, clique, attributes, Matrix):
-            res.append(clique)
+            AFC_res.append(clique)
+            Count_AFC[len(clique)]+=1
+            AFC_maxi=max(len(clique),AFC_maxi)
         else:
             powerset = AttributedConceptsDerivation(clique)
             powerset.sort(key=lambda x: len(x), reverse=True)
@@ -65,6 +69,32 @@ def BKMiner(V, node_attribute_set, R_input):
                     continue
                 if FairnessFilter(sub, sub, attributes, Matrix):
                     cur_maxi.append(sub)
-                    res.append(sub)
-    print(len(res))               
-    return res
+                    AFC_res.append(sub) 
+                    Count_AFC[len(sub)]+=1
+                    AFC_maxi=max(len(sub),AFC_maxi)
+        X1=clique
+        if WFC_FairnessFilter(X1, attributes, Matrix, k=k, delta=delta):
+            WFC_res.append(X1)
+            Count_WFC[len(X1)]+=1
+            WFC_maxi=max(len(X1),WFC_maxi)
+        else:
+            powerset = AttributedConceptsDerivation(X1) if 'powerset' not in locals() else powerset
+            powerset.sort(key=lambda x: len(x), reverse=True)
+            cur_maxi=[]
+            for sub in powerset:
+                if not sub:
+                    continue
+                flag=False
+                for cur in cur_maxi:
+                    if (cur&sub)==sub:
+                        flag=True
+                        break
+                if flag:continue
+                if WFC_FairnessFilter(sub, attributes, Matrix, k=k, delta=delta):
+                    cur_maxi.append(sub)
+                    WFC_res.append(sub)   
+                    Count_WFC[len(sub)]+=1    
+                    WFC_maxi=max(len(sub),WFC_maxi)
+    print(len(AFC_res),len(WFC_res))     
+    print(AFC_maxi,WFC_maxi)
+    return AFC_res,WFC_res,AFC_maxi,WFC_maxi,Count_AFC,Count_WFC

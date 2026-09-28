@@ -1,9 +1,9 @@
-from preprocess_fb100 import load_facebook100_data, split_preprocessed_data
+from sparse_preprocess import load_facebook100_data, split_preprocessed_data
 
 TOP_NODE_COUNT = 1500
 DATASET_FILE = "American75.mat"
 DATASET_FOLDER = "facebook100"
-SUBSET_SIZES = [250,500, 750]#,1000, 1250, 1500]
+SUBSET_SIZES = [250,500, 750]#,1000]#, 1250, 1500]
 
 
 def load_top_1500_graph(attribute_type="gender", granularity=2):

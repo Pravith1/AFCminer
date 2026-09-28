@@ -27,7 +27,7 @@ def find_extent(intent,ori_extent,C):
 # lets see how level by level its explored
 # level 1:(1) (2) (3) (4)
 # level 2:(1,2) (1,3) (1,4) (2,3) (2,4) (3,4)
-# level 3:(1,2,3) (1,2,4) (1,3,4)
+# level 3:(1,2,3) (1,2,4) (1,3,4) (1,2,3,4)
 #But not all the combination is explored as two nodes may never share any node and the path can be pruned
 #for example if 1,2 doesnt have common node then 1,2,3 and 1,2,4 cant exist and as we use conceptset as visited 
 #we wont explore same path second time
