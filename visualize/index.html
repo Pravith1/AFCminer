@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFCMiner 3D - Absolute vs Weak Fair Clique Visualizer</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- 3D Force Graph Library -->
+  <script src="https://unpkg.com/3d-force-graph"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 3D WebGL Canvas Container -->
+  <div id="3d-graph"></div>
+
+  <!-- Top KPI Status Display -->
+  <header class="top-bar">
+    <div class="kpi-container">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-nodes">-</div>
+        <div class="kpi-label">Nodes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-edges">-</div>
+        <div class="kpi-label">Edges</div>
+      </div>
+      <div class="kpi-card kpi-afc">
+        <div class="kpi-value" id="kpi-afc">-</div>
+        <div class="kpi-label">Total AFC</div>
+      </div>
+      <div class="kpi-card kpi-wfc">
+        <div class="kpi-value" id="kpi-wfc">-</div>
+        <div class="kpi-label">Total WFC</div>
+      </div>
+      <div class="kpi-card kpi-overlap">
+        <div class="kpi-value" id="kpi-overlap">-</div>
+        <div class="kpi-label">Dual Members</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Left Control Dock -->
+  <aside class="control-dock">
+    <!-- Dataset Subset Selection -->
+    <div class="control-group">
+      <div class="dock-section-title">
+        <span>Graph Dataset</span>
+        <span id="subset-tag" style="color: #60a5fa;">SubSet 1</span>
+      </div>
+      <select id="subset-select">
+        <option value="1">SubSet 1 (250 Nodes, 750 Edges)</option>
+        <option value="2">SubSet 2 (500 Nodes, 2000 Edges)</option>
+        <option value="3">SubSet 3 (750 Nodes, 3750 Edges)</option>
+      </select>
+    </div>
+
+    <!-- Category Mode Filter -->
+    <div class="control-group">
+      <div class="dock-section-title">Filter Clique Category</div>
+      <div class="pill-tabs" id="clique-filter-tabs">
+        <button class="pill-btn active" data-filter="all">All</button>
+        <button class="pill-btn pill-afc" data-filter="afc">AFC</button>
+        <button class="pill-btn pill-wfc" data-filter="wfc">WFC</button>
+        <button class="pill-btn pill-both" data-filter="both">Overlap</button>
+      </div>
+    </div>
+
+    <!-- Number of Cliques to Overlay -->
+    <div class="control-group">
+      <div class="dock-section-title">
+        <span>Overlay Top Cliques</span>
+        <span class="slider-val" id="top-n-label">Top 5</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="top-n-slider" min="1" max="30" value="5">
+      </div>
+    </div>
+
+    <!-- Specific Clique Dropdown Selector -->
+    <div class="control-group">
+      <div class="dock-section-title">Focus Specific Clique</div>
+      <select id="clique-select">
+        <option value="">-- Select a Clique to Focus --</option>
+      </select>
+    </div>
+
+    <!-- Node Color Mapping Attribute -->
+    <div class="control-group">
+      <div class="dock-section-title">Node Color Mode</div>
+      <select id="color-mode-select">
+        <option value="gender">Demographic: Gender (Female / Male)</option>
+        <option value="multidim">Demographic: Gender & Year Cohort</option>
+        <option value="role">Network Role (AFC / WFC / Background)</option>
+      </select>
+    </div>
+
+    <!-- View & Rendering Controls -->
+    <div class="control-group">
+      <div class="dock-section-title">Rendering & Isolation</div>
+      
+      <div class="toggle-row">
+        <label for="isolate-toggle">Isolate Cliques Only</label>
+        <label class="switch">
+          <input type="checkbox" id="isolate-toggle">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+
+      <div class="dock-section-title" style="margin-top: 6px;">
+        <span>Background Edge Opacity</span>
+        <span class="slider-val" id="edge-opacity-label">0.08</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="edge-opacity-slider" min="0" max="0.5" step="0.02" value="0.08">
+      </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="btn-row">
+      <button class="action-btn" id="btn-reset-camera">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        Reset Camera
+      </button>
+      <button class="action-btn" id="btn-toggle-spin">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        Auto Rotate
+      </button>
+    </div>
+  </aside>
+
+  <!-- Right Inspector HUD (Active Selection Details) -->
+  <aside class="inspector-panel" id="inspector-panel">
+    <div class="clique-header">
+      <div>
+        <div class="clique-id" id="insp-title">Select a Clique</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;" id="insp-subtitle">
+          Hover or select a clique to inspect fairness
+        </div>
+      </div>
+      <div id="insp-badge" class="badge badge-afc" style="display: none;">AFC</div>
+    </div>
+
+    <!-- Fairness Evaluation Card -->
+    <div class="dist-box" id="fairness-card">
+      <div class="dist-title">
+        <span>FAIRNESS CRITERION</span>
+        <span id="fairness-verdict" style="color: var(--accent-afc); font-weight: 700;">-</span>
+      </div>
+      <div id="fairness-desc" style="font-size: 0.72rem; color: #cbd5e1; line-height: 1.4;">
+        Absolute Fair Cliques require exact proportional parity among demographic groups.
+      </div>
+    </div>
+
+    <!-- Demographic Distribution Breakdown -->
+    <div class="dist-box" id="demographic-breakdown">
+      <div class="dist-title">
+        <span>GENDER BALANCE</span>
+        <span id="gender-summary" style="font-family: 'JetBrains Mono', monospace;">-</span>
+      </div>
+      <div class="bar-row">
+        <div class="bar-labels">
+          <span style="color: var(--female-color);">Female</span>
+          <span id="female-count">0</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="female-bar" style="background: var(--female-color); width: 50%;"></div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-labels">
+          <span style="color: var(--male-color);">Male</span>
+          <span id="male-count">0</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="male-bar" style="background: var(--male-color); width: 50%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multidimensional Breakdown -->
+    <div class="dist-box" id="multidim-box">
+      <div class="dist-title">COHORT REPRESENTATION</div>
+      <div id="multidim-bars" style="display: flex; flex-direction: column; gap: 6px;">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Member Nodes List -->
+    <div>
+      <div class="dock-section-title">
+        <span>Clique Members</span>
+        <span id="member-count-badge" style="font-family: 'JetBrains Mono'; color: #93c5fd;">0 Nodes</span>
+      </div>
+      <div class="nodes-grid" id="clique-nodes-grid">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Legend Bar -->
+  <footer class="bottom-legend" id="dynamic-legend">
+    <!-- Populated dynamically based on color mode -->
+  </footer>
+
+  <!-- Scripts -->
+  <script src="network_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
