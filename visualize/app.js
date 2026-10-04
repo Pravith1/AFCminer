@@ -1,596 +1,342 @@
-// State management
-let graphDataPayload = null;
-let currentSubsetKey = "1";
-let activeCliqueFilter = "all"; // 'all', 'afc', 'wfc', 'both'
-let topNLimit = 5;
-let selectedClique = null;
-let colorMode = "gender"; // 'gender', 'multidim', 'role'
-let isolateMode = false;
-let backgroundEdgeOpacity = 0.08;
-let isAutoRotating = false;
+/**
+ * AFCMiner - Maximal Clique Breakdown: AFC vs WFC
+ * Interactive Split-Screen 2D Render Engine
+ */
 
-// Palette constants
-const COLORS = {
-  afc: "#00f0ff",
-  wfc: "#ff9f1c",
-  both: "#e040fb",
-  female: "#f43f5e",
-  male: "#06b6d4",
-  femaleJrSr: "#f43f5e",
-  femaleFrSo: "#fb923c",
-  maleJrSr: "#06b6d4",
-  maleFrSo: "#a855f7",
-  bgNode: "#334155",
-  bgEdge: "rgba(100, 116, 139, 0.2)"
-};
+(function () {
+  'use strict';
 
-// Initialize 3D Force Graph
-const elem = document.getElementById('3d-graph');
-const Graph = ForceGraph3D()(elem)
-  .backgroundColor('#070a12')
-  .showNavInfo(false)
-  .nodeRelSize(5)
-  .nodeResolution(16)
-  .linkResolution(6)
-  .nodeLabel(node => `
-    <div style="background: rgba(13, 20, 36, 0.95); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(99,133,200,0.4); font-family: Outfit, sans-serif;">
-      <div style="font-weight:700; color:#fff; font-size:14px;">${node.label}</div>
-      <div style="color:#94a3b8; font-size:12px; margin-top:2px;">Gender: <b style="color:${node.gender === 'female' ? COLORS.female : COLORS.male}">${node.gender}</b></div>
-      <div style="color:#94a3b8; font-size:12px;">Cohort: <b>${node.year_group}</b></div>
-      <div style="color:#94a3b8; font-size:12px;">Degree: <b>${node.degree}</b></div>
-      ${node.__cliques && node.__cliques.length ? `<div style="margin-top:4px; font-size:11px; color:#00f0ff;">In ${node.__cliques.length} Clique(s): ${node.__cliques.join(', ')}</div>` : ''}
-    </div>
-  `)
-  .nodeColor(getNodeColor)
-  .nodeVal(getNodeVal)
-  .linkColor(getLinkColor)
-  .linkWidth(getLinkWidth)
-  .linkDirectionalParticles(getLinkParticles)
-  .linkDirectionalParticleWidth(1.6)
-  .linkDirectionalParticleSpeed(0.008)
-  .onNodeClick(node => {
-    // Smoothly fly camera to center on clicked node
-    const distance = 120;
-    const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
-    Graph.cameraPosition(
-      { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
-      node,
-      1500
-    );
-  });
+  // --- State Management ---
+  let graphData = null;
+  let currentSubsetId = "1";
+  let currentMaximalCliqueId = null;
+  let colorMode = "gender"; // "gender" | "multidim"
 
-// Load data with fallback support (fetch JSON or window.GRAPH_DATA from network_data.js)
-async function initData() {
-  if (window.GRAPH_DATA) {
-    graphDataPayload = window.GRAPH_DATA;
-  } else {
-    try {
-      const res = await fetch('network_data.json');
-      graphDataPayload = await res.json();
-    } catch (e) {
-      console.error("Failed to fetch network_data.json, checking window.GRAPH_DATA fallback...", e);
+  // --- DOM Elements ---
+  const subsetSelect = document.getElementById("subset-select");
+  const mcSelect = document.getElementById("mc-select");
+  const colorModeSelect = document.getElementById("color-mode-select");
+  const tooltip = document.getElementById("tooltip");
+
+  // SVG Viewports
+  const svgAFC = document.getElementById("svg-afc");
+  const svgWFC = document.getElementById("svg-wfc");
+
+  // --- Cohort Color Palette ---
+  const COHORT_COLORS = {
+    "female | fresh_soph": "#ec4899",     // Pink
+    "female | junior_senior": "#f43f5e",   // Rose / Coral
+    "female | grad_other": "#d946ef",      // Magenta
+    "male | fresh_soph": "#3b82f6",        // Vibrant Blue
+    "male | junior_senior": "#06b6d4",     // Cyan
+    "male | grad_other": "#6366f1"         // Indigo
+  };
+
+  function getNodeColor(nodeObj) {
+    if (colorMode === "multidim") {
+      return COHORT_COLORS[nodeObj.attribute] || (nodeObj.gender === "female" ? "#ec4899" : "#3b82f6");
     }
+    return nodeObj.gender === "female" ? "#ec4899" : "#3b82f6";
   }
 
-  if (!graphDataPayload) {
-    alert("Failed to load graph data. Please verify network_data.json exists.");
-    return;
-  }
-
-  setupEventListeners();
-  loadSubsetValue(currentSubsetKey);
-}
-
-function setupEventListeners() {
-  // Subset dropdown
-  const subsetSelect = document.getElementById('subset-select');
-  subsetSelect.addEventListener('change', (e) => {
-    currentSubsetKey = e.target.value;
-    document.getElementById('subset-tag').textContent = `SubSet ${currentSubsetKey}`;
-    loadSubsetValue(currentSubsetKey);
-  });
-
-  // Filter tabs
-  const tabs = document.querySelectorAll('#clique-filter-tabs button');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      activeCliqueFilter = tab.dataset.filter;
-      updateCliqueList();
-      updateGraphVisuals();
-    });
-  });
-
-  // Top N slider
-  const topNSlider = document.getElementById('top-n-slider');
-  const topNLabel = document.getElementById('top-n-label');
-  topNSlider.addEventListener('input', (e) => {
-    topNLimit = parseInt(e.target.value, 10);
-    topNLabel.textContent = `Top ${topNLimit}`;
-    updateGraphVisuals();
-  });
-
-  // Clique specific dropdown
-  const cliqueSelect = document.getElementById('clique-select');
-  cliqueSelect.addEventListener('change', (e) => {
-    const val = e.target.value;
-    if (!val) {
-      selectedClique = null;
-      resetInspector();
+  // --- Initialization ---
+  function init() {
+    if (window.GRAPH_DATA) {
+      graphData = window.GRAPH_DATA;
     } else {
-      const allCliques = getAllCliquesForSubset(currentSubsetKey);
-      selectedClique = allCliques.find(c => c.id === val);
-      populateInspector(selectedClique);
-      focusCameraOnClique(selectedClique);
+      console.error("GRAPH_DATA not loaded");
+      return;
     }
-    updateGraphVisuals();
-  });
 
-  // Color Mode
-  const colorSelect = document.getElementById('color-mode-select');
-  colorSelect.addEventListener('change', (e) => {
-    colorMode = e.target.value;
-    updateLegend();
-    updateGraphVisuals();
-  });
+    // Bind Event Listeners
+    subsetSelect.addEventListener("change", (e) => {
+      currentSubsetId = e.target.value;
+      populateMaximalCliqueDropdown();
+      renderCurrentSelection();
+    });
 
-  // Isolate Mode
-  const isolateToggle = document.getElementById('isolate-toggle');
-  isolateToggle.addEventListener('change', (e) => {
-    isolateMode = e.target.checked;
-    refreshGraphData();
-  });
+    mcSelect.addEventListener("change", (e) => {
+      currentMaximalCliqueId = e.target.value;
+      renderCurrentSelection();
+    });
 
-  // Edge Opacity Slider
-  const edgeOpacitySlider = document.getElementById('edge-opacity-slider');
-  const edgeOpacityLabel = document.getElementById('edge-opacity-label');
-  edgeOpacitySlider.addEventListener('input', (e) => {
-    backgroundEdgeOpacity = parseFloat(e.target.value);
-    edgeOpacityLabel.textContent = backgroundEdgeOpacity.toFixed(2);
-    updateGraphVisuals();
-  });
+    colorModeSelect.addEventListener("change", (e) => {
+      colorMode = e.target.value;
+      renderCurrentSelection();
+    });
 
-  // Action buttons
-  document.getElementById('btn-reset-camera').addEventListener('click', () => {
-    Graph.cameraPosition({ x: 0, y: 0, z: 450 }, { x: 0, y: 0, z: 0 }, 1200);
-  });
+    // Initial Population
+    populateMaximalCliqueDropdown();
+    renderCurrentSelection();
+  }
 
-  const spinBtn = document.getElementById('btn-toggle-spin');
-  spinBtn.addEventListener('click', () => {
-    isAutoRotating = !isAutoRotating;
-    spinBtn.style.background = isAutoRotating ? 'rgba(37, 99, 235, 0.4)' : '';
-  });
+  // Populate Maximal Clique Dropdown
+  function populateMaximalCliqueDropdown() {
+    const subsetObj = graphData.subsets[currentSubsetId];
+    if (!subsetObj || !subsetObj.maximal_cliques) return;
 
-  // Auto rotation ticker
-  let angle = 0;
-  setInterval(() => {
-    if (isAutoRotating) {
-      angle += Math.PI / 800;
-      const distance = 420;
-      Graph.cameraPosition({
-        x: distance * Math.sin(angle),
-        z: distance * Math.cos(angle)
+    mcSelect.innerHTML = "";
+    subsetObj.maximal_cliques.forEach((mc, idx) => {
+      const option = document.createElement("option");
+      option.value = mc.id;
+      
+      const afcPrunedCnt = mc.afc.derived_cliques[0] ? mc.afc.derived_cliques[0].pruned_nodes.length : 0;
+      const wfcPrunedCnt = mc.wfc.derived_cliques[0] ? mc.wfc.derived_cliques[0].pruned_nodes.length : 0;
+      
+      let statusStr = "";
+      if (mc.afc.is_already_fair && mc.wfc.is_already_fair) {
+        statusStr = "[Fair] Already Fair (AFC & WFC)";
+      } else if (mc.wfc.is_already_fair) {
+        statusStr = `[AFC Pruned: ${afcPrunedCnt}] WFC Fair`;
+      } else {
+        statusStr = `[Pruned: AFC ${afcPrunedCnt} / WFC ${wfcPrunedCnt}]`;
+      }
+
+      option.textContent = `${mc.name} - ${mc.gender_counts.female || 0}F / ${mc.gender_counts.male || 0}M (${statusStr})`;
+      mcSelect.appendChild(option);
+    });
+
+    if (subsetObj.maximal_cliques.length > 0) {
+      currentMaximalCliqueId = subsetObj.maximal_cliques[0].id;
+      mcSelect.value = currentMaximalCliqueId;
+    }
+  }
+
+  // --- Main Render Controller ---
+  function renderCurrentSelection(overridePrunedStates = null) {
+    const subsetObj = graphData.subsets[currentSubsetId];
+    if (!subsetObj) return;
+
+    const mc = subsetObj.maximal_cliques.find(item => item.id === currentMaximalCliqueId);
+    if (!mc) return;
+
+    const nodesLookup = subsetObj.nodes_lookup;
+
+    // Derived AFC and WFC info
+    const afcDerived = mc.afc.derived_cliques[0] || { nodes: mc.nodes, pruned_nodes: [] };
+    const wfcDerived = mc.wfc.derived_cliques[0] || { nodes: mc.nodes, pruned_nodes: [] };
+
+    const afcPrunedSet = new Set(overridePrunedStates ? overridePrunedStates.afcPruned : afcDerived.pruned_nodes);
+    const wfcPrunedSet = new Set(overridePrunedStates ? overridePrunedStates.wfcPruned : wfcDerived.pruned_nodes);
+
+    // 1. Render Left Panel (AFC)
+    renderCliqueGraph(svgAFC, mc.nodes, afcPrunedSet, nodesLookup);
+    updatePanelFooter("afc", mc, afcDerived, afcPrunedSet.size, nodesLookup);
+
+    // 2. Render Right Panel (WFC)
+    renderCliqueGraph(svgWFC, mc.nodes, wfcPrunedSet, nodesLookup);
+    updatePanelFooter("wfc", mc, wfcDerived, wfcPrunedSet.size, nodesLookup);
+  }
+
+  // --- 2D Circular Graph Renderer ---
+  function renderCliqueGraph(svgElement, cliqueNodeIds, prunedNodeSet, nodesLookup) {
+    svgElement.innerHTML = "";
+
+    const width = 500;
+    const height = 360;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) * 0.36;
+
+    const total = cliqueNodeIds.length;
+    const nodePositions = {};
+
+    // Compute node coordinates along circle
+    cliqueNodeIds.forEach((nid, i) => {
+      const angle = (2 * Math.PI * i) / total - Math.PI / 2;
+      nodePositions[nid] = {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      };
+    });
+
+    // Create SVG Groups
+    const edgeGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const nodeGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    svgElement.appendChild(edgeGroup);
+    svgElement.appendChild(nodeGroup);
+
+    // Draw Edges between all pairs (Clique)
+    for (let i = 0; i < total; i++) {
+      for (let j = i + 1; j < total; j++) {
+        const u = cliqueNodeIds[i];
+        const v = cliqueNodeIds[j];
+
+        const isUPruned = prunedNodeSet.has(u);
+        const isVPruned = prunedNodeSet.has(v);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", nodePositions[u].x);
+        line.setAttribute("y1", nodePositions[u].y);
+        line.setAttribute("x2", nodePositions[v].x);
+        line.setAttribute("y2", nodePositions[v].y);
+
+        if (isUPruned || isVPruned) {
+          line.setAttribute("class", "svg-edge svg-edge-pruned");
+        } else {
+          line.setAttribute("class", "svg-edge");
+        }
+
+        edgeGroup.appendChild(line);
+      }
+    }
+
+    // Draw Nodes
+    cliqueNodeIds.forEach((nid) => {
+      const nObj = nodesLookup[nid];
+      const pos = nodePositions[nid];
+      const isPruned = prunedNodeSet.has(nid);
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("class", "svg-node-group");
+      g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
+
+      // Outer glow / circle
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("r", 18);
+      const color = getNodeColor(nObj);
+      circle.setAttribute("fill", color);
+      circle.setAttribute("class", `svg-node-circle ${isPruned ? "pruned" : "retained"}`);
+
+      // Node Label (Node ID / User Number)
+      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label.setAttribute("class", "svg-node-label");
+      label.setAttribute("dy", "4");
+      label.textContent = nid.replace("v", "");
+
+      g.appendChild(circle);
+      g.appendChild(label);
+
+      // If pruned, append Red ✕ Badge
+      if (isPruned) {
+        const cross = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        cross.setAttribute("class", "svg-cross-badge");
+        cross.setAttribute("x", "14");
+        cross.setAttribute("y", "-10");
+        cross.textContent = "✕";
+        g.appendChild(cross);
+      }
+
+      // Hover Tooltip Events
+      g.addEventListener("mouseenter", (evt) => showTooltip(evt, nObj, isPruned));
+      g.addEventListener("mousemove", (evt) => moveTooltip(evt));
+      g.addEventListener("mouseleave", hideTooltip);
+
+      nodeGroup.appendChild(g);
+    });
+  }
+
+  // --- Update Panel KPI Footers ---
+  function updatePanelFooter(type, mc, derivedObj, activePrunedCount, nodesLookup) {
+    const isAFC = (type === "afc");
+    const kpiSize = document.getElementById(`${type}-kpi-size`);
+    const kpiPruned = document.getElementById(`${type}-kpi-pruned`);
+    const kpiStatus = document.getElementById(`${type}-kpi-status`);
+
+    const femaleBar = document.getElementById(`${type}-female-bar`);
+    const maleBar = document.getElementById(`${type}-male-bar`);
+    const cntFemale = document.getElementById(`${type}-cnt-female`);
+    const cntMale = document.getElementById(`${type}-cnt-male`);
+    const parityRatio = document.getElementById(`${type}-parity-ratio`);
+
+    const prunedList = document.getElementById(`${type}-pruned-list`);
+
+    // Retained size
+    const retainedSize = mc.size - activePrunedCount;
+    kpiSize.textContent = `${retainedSize} / ${mc.size}`;
+    kpiPruned.textContent = activePrunedCount;
+
+    // Status
+    const isAlready = isAFC ? mc.afc.is_already_fair : mc.wfc.is_already_fair;
+    if (activePrunedCount === 0) {
+      kpiStatus.textContent = isAlready ? "Natural Fair" : "Full Clique";
+      kpiStatus.style.color = "#10b981";
+    } else {
+      kpiStatus.textContent = isAFC ? "Pruned for Parity" : "Pruned for WFC";
+      kpiStatus.style.color = isAFC ? "var(--accent-afc)" : "var(--accent-wfc)";
+    }
+
+    // Gender breakdown of retained nodes
+    let fCount = 0;
+    let mCount = 0;
+
+    const prunedSet = new Set(derivedObj.pruned_nodes);
+    mc.nodes.forEach(nid => {
+      if (!prunedSet.has(nid)) {
+        const g = nodesLookup[nid].gender;
+        if (g === "female") fCount++;
+        else if (g === "male") mCount++;
+      }
+    });
+
+    cntFemale.textContent = fCount;
+    cntMale.textContent = mCount;
+
+    const totalRetained = fCount + mCount;
+    const fPct = totalRetained > 0 ? (fCount / totalRetained) * 100 : 50;
+    const mPct = totalRetained > 0 ? (mCount / totalRetained) * 100 : 50;
+
+    femaleBar.style.width = `${fPct}%`;
+    maleBar.style.width = `${mPct}%`;
+    parityRatio.textContent = `${fCount}F : ${mCount}M`;
+
+    // Render Pruned Nodes Tags
+    prunedList.innerHTML = "";
+    if (derivedObj.pruned_nodes.length === 0) {
+      prunedList.innerHTML = `<span class="tag-none">No nodes pruned (100% Retained)</span>`;
+    } else {
+      derivedObj.pruned_nodes.forEach(nid => {
+        const nObj = nodesLookup[nid];
+        const span = document.createElement("span");
+        span.className = "tag-pruned";
+        span.innerHTML = `<span>Pruned: ${nid} (${nObj.gender[0].toUpperCase()})</span>`;
+        prunedList.appendChild(span);
       });
     }
-  }, 30);
-}
-
-// Retrieve active subset data
-function getActiveSubset() {
-  return graphDataPayload.subsets[currentSubsetKey];
-}
-
-function getAllCliquesForSubset(subKey) {
-  const sub = graphDataPayload.subsets[subKey];
-  return [...sub.afc_cliques, ...sub.wfc_cliques];
-}
-
-function getFilteredCliques() {
-  const sub = getActiveSubset();
-  let list = [];
-  if (activeCliqueFilter === 'all') {
-    list = [...sub.afc_cliques, ...sub.wfc_cliques];
-  } else if (activeCliqueFilter === 'afc') {
-    list = sub.afc_cliques;
-  } else if (activeCliqueFilter === 'wfc') {
-    list = sub.wfc_cliques;
-  } else if (activeCliqueFilter === 'both') {
-    list = sub.afc_cliques.filter(c => c.is_also_other);
-  }
-  return list;
-}
-
-function loadSubsetValue(key) {
-  const sub = graphDataPayload.subsets[key];
-  if (!sub) return;
-
-  // Update KPI banner
-  document.getElementById('kpi-nodes').textContent = sub.node_count;
-  document.getElementById('kpi-edges').textContent = sub.edge_count;
-  document.getElementById('kpi-afc').textContent = sub.stats.total_afc;
-  document.getElementById('kpi-wfc').textContent = sub.stats.total_wfc;
-  document.getElementById('kpi-overlap').textContent = sub.stats.overlapping_cliques;
-
-  // Adjust slider max to available cliques
-  const totalCliques = sub.afc_cliques.length + sub.wfc_cliques.length;
-  const topNSlider = document.getElementById('top-n-slider');
-  topNSlider.max = Math.max(1, totalCliques);
-  if (topNLimit > totalCliques) topNLimit = Math.min(5, totalCliques);
-  topNSlider.value = topNLimit;
-  document.getElementById('top-n-label').textContent = `Top ${topNLimit}`;
-
-  // Reset selection
-  selectedClique = null;
-  resetInspector();
-
-  // Populate dropdown & legend
-  updateCliqueList();
-  updateLegend();
-
-  // Render Graph
-  refreshGraphData();
-
-  // Auto-focus first AFC clique if available
-  if (sub.afc_cliques.length > 0) {
-    setTimeout(() => {
-      const firstAfc = sub.afc_cliques[0];
-      document.getElementById('clique-select').value = firstAfc.id;
-      selectedClique = firstAfc;
-      populateInspector(firstAfc);
-      focusCameraOnClique(firstAfc);
-      updateGraphVisuals();
-    }, 1000);
-  }
-}
-
-function updateCliqueList() {
-  const select = document.getElementById('clique-select');
-  select.innerHTML = '<option value="">-- Select a Clique to Focus --</option>';
-
-  const filtered = getFilteredCliques();
-  filtered.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id;
-    const tag = c.is_also_other ? '[AFC & WFC]' : `[${c.type}]`;
-    const femCount = c.gender_counts.female || 0;
-    const maleCount = c.gender_counts.male || 0;
-    opt.textContent = `${tag} ${c.id} (Size ${c.size}) • ${femCount}F, ${maleCount}M`;
-    select.appendChild(opt);
-  });
-}
-
-function refreshGraphData() {
-  const sub = getActiveSubset();
-
-  // Pre-tag nodes with their clique memberships
-  const nodeCliqueMap = {};
-  sub.nodes.forEach(n => nodeCliqueMap[n.id] = []);
-  [...sub.afc_cliques, ...sub.wfc_cliques].forEach(c => {
-    c.nodes.forEach(nid => {
-      if (nodeCliqueMap[nid] && !nodeCliqueMap[nid].includes(c.id)) {
-        nodeCliqueMap[nid].push(c.id);
-      }
-    });
-  });
-
-  let nodes = sub.nodes.map(n => ({
-    ...n,
-    __cliques: nodeCliqueMap[n.id] || []
-  }));
-
-  let links = sub.links.map(l => ({ ...l }));
-
-  // If isolateMode is on, filter to only nodes belonging to active visible cliques
-  if (isolateMode) {
-    const activeCliques = getActiveVisibleCliques();
-    const activeNodeIds = new Set();
-    activeCliques.forEach(c => c.nodes.forEach(nid => activeNodeIds.add(nid)));
-
-    if (activeNodeIds.size > 0) {
-      nodes = nodes.filter(n => activeNodeIds.has(n.id));
-      links = links.filter(l => activeNodeIds.has(l.source.id || l.source) && activeNodeIds.has(l.target.id || l.target));
-    }
   }
 
-  Graph.graphData({ nodes, links });
-  updateGraphVisuals();
-}
 
-function getActiveVisibleCliques() {
-  if (selectedClique) {
-    return [selectedClique];
-  }
-  const filtered = getFilteredCliques();
-  return filtered.slice(0, topNLimit);
-}
 
-function updateGraphVisuals() {
-  Graph.nodeColor(getNodeColor)
-       .nodeVal(getNodeVal)
-       .linkColor(getLinkColor)
-       .linkWidth(getLinkWidth)
-       .linkDirectionalParticles(getLinkParticles);
-}
-
-// Node Visual Properties
-function getNodeColor(node) {
-  const visibleCliques = getActiveVisibleCliques();
-  const inVisibleClique = visibleCliques.some(c => c.nodes.includes(node.id));
-
-  if (colorMode === "gender") {
-    if (!inVisibleClique && !isolateMode) {
-      return node.gender === "female" ? "rgba(244, 63, 94, 0.25)" : "rgba(6, 182, 212, 0.25)";
-    }
-    return node.gender === "female" ? COLORS.female : COLORS.male;
-  } 
-  else if (colorMode === "multidim") {
-    const key = `${node.gender} | ${node.year_group}`;
-    let baseColor = COLORS.maleFrSo;
-    if (key === "female | junior_senior") baseColor = COLORS.femaleJrSr;
-    else if (key === "female | fresh_soph") baseColor = COLORS.femaleFrSo;
-    else if (key === "male | junior_senior") baseColor = COLORS.maleJrSr;
-
-    if (!inVisibleClique && !isolateMode) {
-      return hexToRgba(baseColor, 0.25);
-    }
-    return baseColor;
-  }
-  else { // 'role'
-    const inAfc = getActiveSubset().afc_cliques.some(c => c.nodes.includes(node.id));
-    const inWfc = getActiveSubset().wfc_cliques.some(c => c.nodes.includes(node.id));
-
-    if (inAfc && inWfc) return COLORS.both;
-    if (inAfc) return COLORS.afc;
-    if (inWfc) return COLORS.wfc;
-    return COLORS.bgNode;
-  }
-}
-
-function getNodeVal(node) {
-  const visibleCliques = getActiveVisibleCliques();
-  const inVisibleClique = visibleCliques.some(c => c.nodes.includes(node.id));
-
-  if (selectedClique && selectedClique.nodes.includes(node.id)) {
-    return 9; // Large prominent sphere for focused clique
-  }
-  if (inVisibleClique) {
-    return 6;
-  }
-  return 2.5; // Dim smaller background sphere
-}
-
-// Link Visual Properties
-function getLinkColor(link) {
-  const u = link.source.id || link.source;
-  const v = link.target.id || link.target;
-
-  const visibleCliques = getActiveVisibleCliques();
-  for (let c of visibleCliques) {
-    if (c.nodes.includes(u) && c.nodes.includes(v)) {
-      if (c.is_also_other) return COLORS.both;
-      return c.type === "AFC" ? COLORS.afc : COLORS.wfc;
-    }
-  }
-
-  return `rgba(100, 116, 139, ${backgroundEdgeOpacity})`;
-}
-
-function getLinkWidth(link) {
-  const u = link.source.id || link.source;
-  const v = link.target.id || link.target;
-
-  const visibleCliques = getActiveVisibleCliques();
-  for (let c of visibleCliques) {
-    if (c.nodes.includes(u) && c.nodes.includes(v)) {
-      return selectedClique ? 3.5 : 2.2;
-    }
-  }
-  return 0.4;
-}
-
-function getLinkParticles(link) {
-  const u = link.source.id || link.source;
-  const v = link.target.id || link.target;
-
-  const visibleCliques = getActiveVisibleCliques();
-  for (let c of visibleCliques) {
-    if (c.nodes.includes(u) && c.nodes.includes(v)) {
-      return 3; // Animated glowing pulses along clique edges
-    }
-  }
-  return 0;
-}
-
-// Camera Focus on Selected Clique
-function focusCameraOnClique(clique) {
-  if (!clique || !clique.nodes.length) return;
-
-  const gNodes = Graph.graphData().nodes;
-  const cliqueObjNodes = gNodes.filter(n => clique.nodes.includes(n.id));
-
-  if (!cliqueObjNodes.length) return;
-
-  // Compute centroid of the clique in 3D
-  let cx = 0, cy = 0, cz = 0;
-  cliqueObjNodes.forEach(n => {
-    cx += n.x || 0;
-    cy += n.y || 0;
-    cz += n.z || 0;
-  });
-  cx /= cliqueObjNodes.length;
-  cy /= cliqueObjNodes.length;
-  cz /= cliqueObjNodes.length;
-
-  // Position camera at comfortable inspection distance
-  const distance = 160;
-  Graph.cameraPosition(
-    { x: cx + distance * 0.7, y: cy + distance * 0.5, z: cz + distance },
-    { x: cx, y: cy, z: cz },
-    1400
-  );
-}
-
-// Populate Right Inspector HUD
-function populateInspector(clique) {
-  if (!clique) return;
-
-  const titleElem = document.getElementById('insp-title');
-  const subElem = document.getElementById('insp-subtitle');
-  const badgeElem = document.getElementById('insp-badge');
-
-  titleElem.textContent = `${clique.id}`;
-  subElem.textContent = `Clique Size: ${clique.size} fully connected nodes`;
-
-  badgeElem.style.display = 'inline-flex';
-  if (clique.is_also_other) {
-    badgeElem.textContent = 'AFC & WFC';
-    badgeElem.className = 'badge badge-both';
-  } else if (clique.type === 'AFC') {
-    badgeElem.textContent = 'ABSOLUTE FAIR';
-    badgeElem.className = 'badge badge-afc';
-  } else {
-    badgeElem.textContent = 'WEAK FAIR';
-    badgeElem.className = 'badge badge-wfc';
-  }
-
-  // Fairness Verdict
-  const verdictElem = document.getElementById('fairness-verdict');
-  const descElem = document.getElementById('fairness-desc');
-  if (clique.type === 'AFC') {
-    verdictElem.textContent = 'PERFECT PARITY';
-    verdictElem.style.color = 'var(--accent-afc)';
-    descElem.textContent = 'Every demographic cohort has identical representation. Absolute zero disparity across groups.';
-  } else {
-    verdictElem.textContent = 'RELAXED WEAK FAIR';
-    verdictElem.style.color = 'var(--accent-wfc)';
-    descElem.textContent = 'Satisfies k=1, delta=10 constraints with minority representation guaranteed, allowing higher cardinality.';
-  }
-
-  // Gender Breakdown
-  const fCount = clique.gender_counts.female || 0;
-  const mCount = clique.gender_counts.male || 0;
-  const total = fCount + mCount || 1;
-  const fPct = Math.round((fCount / total) * 100);
-  const mPct = Math.round((mCount / total) * 100);
-
-  document.getElementById('gender-summary').textContent = `${fCount}F (${fPct}%) : ${mCount}M (${mPct}%)`;
-  document.getElementById('female-count').textContent = `${fCount} (${fPct}%)`;
-  document.getElementById('male-count').textContent = `${mCount} (${mPct}%)`;
-  document.getElementById('female-bar').style.width = `${fPct}%`;
-  document.getElementById('male-bar').style.width = `${mPct}%`;
-
-  // Multidim breakdown bars
-  const multiContainer = document.getElementById('multidim-bars');
-  multiContainer.innerHTML = '';
-  const cohorts = [
-    { key: "female | junior_senior", label: "Female Jr/Sr", color: COLORS.femaleJrSr },
-    { key: "female | fresh_soph", label: "Female Fr/So", color: COLORS.femaleFrSo },
-    { key: "male | junior_senior", label: "Male Jr/Sr", color: COLORS.maleJrSr },
-    { key: "male | fresh_soph", label: "Male Fr/So", color: COLORS.maleFrSo }
-  ];
-
-  cohorts.forEach(c => {
-    const count = clique.attribute_counts[c.key] || 0;
-    const pct = Math.round((count / clique.size) * 100);
-
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `
-      <div class="bar-labels">
-        <span style="color: ${c.color}; font-size: 0.72rem;">${c.label}</span>
-        <span style="font-family: 'JetBrains Mono'; font-size: 0.72rem;">${count} (${pct}%)</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" style="background: ${c.color}; width: ${pct}%;"></div>
+  // --- Tooltip Event Handlers ---
+  function showTooltip(evt, nodeObj, isPruned) {
+    tooltip.style.display = "flex";
+    tooltip.innerHTML = `
+      <div class="tooltip-title">User ${nodeObj.id}</div>
+      <div>Gender: <b>${nodeObj.gender.toUpperCase()}</b></div>
+      <div>Cohort: <b>${nodeObj.year_group}</b></div>
+      <div>Degree: <b>${nodeObj.degree}</b></div>
+      <div style="margin-top: 4px; font-weight: 700; color: ${isPruned ? 'var(--accent-danger)' : '#10b981'};">
+        ${isPruned ? 'PRUNED (Removed for Fairness)' : 'RETAINED in Fair Sub-clique'}
       </div>
     `;
-    multiContainer.appendChild(row);
-  });
-
-  // Member Nodes Grid
-  const grid = document.getElementById('clique-nodes-grid');
-  grid.innerHTML = '';
-  document.getElementById('member-count-badge').textContent = `${clique.nodes.length} Nodes`;
-
-  const sub = getActiveSubset();
-  const nodeLookup = {};
-  sub.nodes.forEach(n => nodeLookup[n.id] = n);
-
-  clique.nodes.forEach(nid => {
-    const nData = nodeLookup[nid] || { id: nid, gender: '?', year_group: '?' };
-    const chip = document.createElement('div');
-    chip.className = 'node-chip';
-    chip.innerHTML = `
-      <div class="node-chip-id">${nData.id}</div>
-      <div class="node-chip-sub" style="color: ${nData.gender === 'female' ? COLORS.female : COLORS.male};">${nData.gender}, ${nData.year_group}</div>
-    `;
-    chip.addEventListener('click', () => {
-      const gNode = Graph.graphData().nodes.find(n => n.id === nid);
-      if (gNode) {
-        Graph.cameraPosition(
-          { x: gNode.x + 60, y: gNode.y + 30, z: gNode.z + 80 },
-          gNode,
-          1000
-        );
-      }
-    });
-    grid.appendChild(chip);
-  });
-}
-
-function resetInspector() {
-  document.getElementById('insp-title').textContent = 'Select a Clique';
-  document.getElementById('insp-subtitle').textContent = 'Hover or select a clique to inspect fairness';
-  document.getElementById('insp-badge').style.display = 'none';
-  document.getElementById('fairness-verdict').textContent = '-';
-  document.getElementById('fairness-desc').textContent = 'Absolute Fair Cliques require exact parity. Weak Fair Cliques permit bounded disparities.';
-  document.getElementById('gender-summary').textContent = '-';
-  document.getElementById('female-count').textContent = '0';
-  document.getElementById('male-count').textContent = '0';
-  document.getElementById('female-bar').style.width = '0%';
-  document.getElementById('male-bar').style.width = '0%';
-  document.getElementById('multidim-bars').innerHTML = '<span style="font-size:0.75rem; color:var(--text-dim);">No active clique selected</span>';
-  document.getElementById('clique-nodes-grid').innerHTML = '';
-  document.getElementById('member-count-badge').textContent = '0 Nodes';
-}
-
-// Dynamic Legend Bar update
-function updateLegend() {
-  const legend = document.getElementById('dynamic-legend');
-  legend.innerHTML = '';
-
-  if (colorMode === 'gender') {
-    legend.innerHTML = `
-      <div class="legend-item"><span class="dot" style="background:${COLORS.female};"></span> Female</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.male};"></span> Male</div>
-      <div class="legend-item" style="margin-left: 10px; border-left: 1px solid rgba(255,255,255,0.15); padding-left: 15px;"><span class="dot" style="background:${COLORS.afc}; box-shadow: 0 0 6px ${COLORS.afc};"></span> AFC Links</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.wfc}; box-shadow: 0 0 6px ${COLORS.wfc};"></span> WFC Links</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.both}; box-shadow: 0 0 6px ${COLORS.both};"></span> Overlap Links</div>
-    `;
-  } else if (colorMode === 'multidim') {
-    legend.innerHTML = `
-      <div class="legend-item"><span class="dot" style="background:${COLORS.femaleJrSr};"></span> Female Jr/Sr</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.femaleFrSo};"></span> Female Fr/So</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.maleJrSr};"></span> Male Jr/Sr</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.maleFrSo};"></span> Male Fr/So</div>
-    `;
-  } else { // 'role'
-    legend.innerHTML = `
-      <div class="legend-item"><span class="dot" style="background:${COLORS.afc};"></span> AFC Member</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.wfc};"></span> WFC Member</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.both};"></span> Dual Member</div>
-      <div class="legend-item"><span class="dot" style="background:${COLORS.bgNode};"></span> Background Node</div>
-    `;
+    moveTooltip(evt);
   }
-}
 
-function hexToRgba(hex, alpha) {
-  let c = hex.replace('#', '');
-  if (c.length === 3) c = c.split('').map(x => x + x).join('');
-  const num = parseInt(c, 16);
-  return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-}
+  function moveTooltip(evt) {
+    const margin = 16;
+    let x = evt.clientX + margin;
+    let y = evt.clientY + margin;
 
-// Boot application
-window.addEventListener('DOMContentLoaded', initData);
+    // Keep tooltip inside window boundaries
+    const tooltipWidth = tooltip.offsetWidth || 180;
+    const tooltipHeight = tooltip.offsetHeight || 120;
+
+    if (x + tooltipWidth > window.innerWidth) {
+      x = evt.clientX - tooltipWidth - margin;
+    }
+    if (y + tooltipHeight > window.innerHeight) {
+      y = evt.clientY - tooltipHeight - margin;
+    }
+
+    tooltip.style.left = `${x}px`;
+    tooltip.style.top = `${y}px`;
+  }
+
+  function hideTooltip() {
+    tooltip.style.display = "none";
+  }
+
+  // Start app on DOM loaded
+  document.addEventListener("DOMContentLoaded", init);
+
+})();
