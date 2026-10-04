@@ -80,23 +80,23 @@
       <div class="panel-footer">
         <div class="kpi-grid">
           <div class="kpi-box">
-            <div class="kpi-num" id="afc-kpi-size">- / -</div>
-            <div class="kpi-sub">Retained / Initial Nodes</div>
+            <div class="kpi-num" id="afc-kpi-subcliques">0</div>
+            <div class="kpi-sub">Derived Fair Cliques</div>
           </div>
           <div class="kpi-box">
-            <div class="kpi-num" id="afc-kpi-pruned">0</div>
-            <div class="kpi-sub">Nodes Pruned</div>
+            <div class="kpi-num" id="afc-kpi-coverage">- / -</div>
+            <div class="kpi-sub">Node Coverage</div>
           </div>
           <div class="kpi-box">
             <div class="kpi-num" id="afc-kpi-status">-</div>
-            <div class="kpi-sub">Fairness Status</div>
+            <div class="kpi-sub">Split Status</div>
           </div>
         </div>
 
         <!-- Gender Parity Progress Bar -->
         <div class="parity-card">
           <div class="parity-title">
-            <span>Demographic Parity</span>
+            <span>Maximal Clique Demographics</span>
             <span id="afc-parity-ratio" class="parity-val">-</span>
           </div>
           <div class="progress-track">
@@ -109,11 +109,14 @@
           </div>
         </div>
 
-        <!-- Pruned Nodes Log -->
-        <div class="pruned-log-box">
-          <div class="pruned-log-title">Pruned Nodes Log</div>
-          <div id="afc-pruned-list" class="pruned-tags-container">
-            <span class="tag-none">No nodes pruned</span>
+        <!-- Derived Sub-cliques Breakdown -->
+        <div class="subclique-log-box">
+          <div class="subclique-log-title">
+            <span>Derived AFC Sub-cliques Breakdown</span>
+            <span id="afc-subclique-badge" class="subclique-count-tag">0 Derived</span>
+          </div>
+          <div id="afc-subcliques-list" class="subclique-cards-container">
+            <span class="tag-none">Loading sub-cliques...</span>
           </div>
         </div>
       </div>
@@ -140,23 +143,23 @@
       <div class="panel-footer">
         <div class="kpi-grid">
           <div class="kpi-box">
-            <div class="kpi-num" id="wfc-kpi-size">- / -</div>
-            <div class="kpi-sub">Retained / Initial Nodes</div>
+            <div class="kpi-num" id="wfc-kpi-subcliques">0</div>
+            <div class="kpi-sub">Derived Fair Cliques</div>
           </div>
           <div class="kpi-box">
-            <div class="kpi-num" id="wfc-kpi-pruned">0</div>
-            <div class="kpi-sub">Nodes Pruned</div>
+            <div class="kpi-num" id="wfc-kpi-coverage">- / -</div>
+            <div class="kpi-sub">Node Coverage</div>
           </div>
           <div class="kpi-box">
             <div class="kpi-num" id="wfc-kpi-status">-</div>
-            <div class="kpi-sub">Fairness Status</div>
+            <div class="kpi-sub">Split Status</div>
           </div>
         </div>
 
         <!-- Gender Parity Progress Bar -->
         <div class="parity-card">
           <div class="parity-title">
-            <span>Demographic Balance</span>
+            <span>Maximal Clique Demographics</span>
             <span id="wfc-parity-ratio" class="parity-val">-</span>
           </div>
           <div class="progress-track">
@@ -169,11 +172,14 @@
           </div>
         </div>
 
-        <!-- Pruned Nodes Log -->
-        <div class="pruned-log-box">
-          <div class="pruned-log-title">Pruned Nodes Log</div>
-          <div id="wfc-pruned-list" class="pruned-tags-container">
-            <span class="tag-none">No nodes pruned</span>
+        <!-- Derived Sub-cliques Breakdown -->
+        <div class="subclique-log-box">
+          <div class="subclique-log-title">
+            <span>Derived WFC Sub-cliques Breakdown</span>
+            <span id="wfc-subclique-badge" class="subclique-count-tag">0 Derived</span>
+          </div>
+          <div id="wfc-subcliques-list" class="subclique-cards-container">
+            <span class="tag-none">Loading sub-cliques...</span>
           </div>
         </div>
       </div>

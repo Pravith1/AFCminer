@@ -18,7 +18,7 @@ DATASET_FILE = "American75.mat"
 DATASET_FOLDER = "facebook100"
 
 DEFAULT_K = 1
-DEFAULT_DELTA = 10
+DEFAULT_DELTA = 2
 
 
 def pregenerate_subsets():
@@ -30,7 +30,7 @@ def pregenerate_subsets():
             mat_filename=DATASET_FILE,
             folder_name=DATASET_FOLDER,
             max_nodes=size,
-            attribute_type="multidim_gender_year",
+            attribute_type="gender",
             granularity=2
         )
         generated_subsets[size] = (nodes, attribute_columns, combined_data)

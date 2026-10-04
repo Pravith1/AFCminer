@@ -130,7 +130,7 @@ def build_visualization_payload():
         "meta": {
             "title": "Absolute Fair Clique (AFC) vs Weak Fair Clique (WFC) Derivation Visualizer",
             "k": 1,
-            "delta": 10,
+            "delta": 2,
             "dataset": DATASET_FILE
         },
         "subsets": {}
