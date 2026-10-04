@@ -7910,29 +7910,6 @@
                 "size": 4,
                 "nodes": [
                   "v1590",
-                  "v3082",
-                  "v5025",
-                  "v5774"
-                ],
-                "pruned_nodes": [
-                  "v2865"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "female | fresh_soph": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v1590",
                   "v2865",
                   "v3082",
                   "v5025"
@@ -7949,6 +7926,29 @@
                   "female | junior_senior": 1,
                   "male | junior_senior": 1,
                   "female | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1590",
+                  "v3082",
+                  "v5025",
+                  "v5774"
+                ],
+                "pruned_nodes": [
+                  "v2865"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "female | fresh_soph": 1,
+                  "female | junior_senior": 1
                 }
               }
             ]
@@ -8012,11 +8012,11 @@
                 "nodes": [
                   "v174",
                   "v4390",
-                  "v6240",
+                  "v548",
                   "v6241"
                 ],
                 "pruned_nodes": [
-                  "v548"
+                  "v6240"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -8035,11 +8035,11 @@
                 "nodes": [
                   "v174",
                   "v4390",
-                  "v548",
+                  "v6240",
                   "v6241"
                 ],
                 "pruned_nodes": [
-                  "v6240"
+                  "v548"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16173,31 +16173,6 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1992",
-                  "v3901",
-                  "v4123",
-                  "v5562"
-                ],
-                "pruned_nodes": [
-                  "v2246",
-                  "v2620",
-                  "v5788"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
                   "v3901",
                   "v4123",
                   "v5562",
@@ -16220,16 +16195,16 @@
                 }
               },
               {
-                "id": "AFC-sub-3",
+                "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
-                  "v2246",
+                  "v1992",
                   "v3901",
                   "v4123",
                   "v5562"
                 ],
                 "pruned_nodes": [
-                  "v1992",
+                  "v2246",
                   "v2620",
                   "v5788"
                 ],
@@ -16242,6 +16217,31 @@
                   "male | fresh_soph": 1,
                   "male | junior_senior": 1,
                   "female | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-3",
+                "size": 4,
+                "nodes": [
+                  "v2620",
+                  "v3901",
+                  "v4123",
+                  "v5788"
+                ],
+                "pruned_nodes": [
+                  "v1992",
+                  "v2246",
+                  "v5562"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | junior_senior": 1,
+                  "male | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "female | fresh_soph": 1
                 }
               },
               {
@@ -16273,25 +16273,25 @@
                 "id": "AFC-sub-5",
                 "size": 4,
                 "nodes": [
-                  "v2620",
+                  "v2246",
                   "v3901",
                   "v4123",
-                  "v5788"
+                  "v5562"
                 ],
                 "pruned_nodes": [
                   "v1992",
-                  "v2246",
-                  "v5562"
+                  "v2620",
+                  "v5788"
                 ],
                 "gender_counts": {
                   "female": 2,
                   "male": 2
                 },
                 "attribute_counts": {
-                  "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
                   "male | fresh_soph": 1,
                   "male | junior_senior": 1,
-                  "female | fresh_soph": 1
+                  "female | junior_senior": 1
                 }
               },
               {
@@ -16381,22 +16381,22 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1801",
                   "v2320",
+                  "v3884",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
-                  "v2994",
-                  "v3884"
+                  "v1801",
+                  "v2994"
                 ],
                 "gender_counts": {
                   "female": 2,
                   "male": 2
                 },
                 "attribute_counts": {
-                  "female | junior_senior": 1,
                   "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -16405,13 +16405,13 @@
                 "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
+                  "v1801",
                   "v2320",
-                  "v2994",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
-                  "v1801",
+                  "v2994",
                   "v3884"
                 ],
                 "gender_counts": {
@@ -16419,8 +16419,8 @@
                   "male": 2
                 },
                 "attribute_counts": {
-                  "male | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -16430,13 +16430,13 @@
                 "size": 4,
                 "nodes": [
                   "v2320",
-                  "v3884",
+                  "v2994",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
                   "v1801",
-                  "v2994"
+                  "v3884"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16611,12 +16611,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v273",
+                  "v1770",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v1770"
+                  "v273"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16634,12 +16634,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v1770",
+                  "v273",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v273"
+                  "v1770"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16713,11 +16713,11 @@
                 "nodes": [
                   "v1430",
                   "v1770",
-                  "v3563",
+                  "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v3736"
+                  "v3563"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16736,11 +16736,11 @@
                 "nodes": [
                   "v1430",
                   "v1770",
-                  "v3736",
+                  "v3563",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v3563"
+                  "v3736"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16814,11 +16814,11 @@
                 "nodes": [
                   "v174",
                   "v4390",
-                  "v6240",
+                  "v548",
                   "v6241"
                 ],
                 "pruned_nodes": [
-                  "v548"
+                  "v6240"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -16837,11 +16837,11 @@
                 "nodes": [
                   "v174",
                   "v4390",
-                  "v548",
+                  "v6240",
                   "v6241"
                 ],
                 "pruned_nodes": [
-                  "v6240"
+                  "v548"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -27771,14 +27771,14 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1508",
                   "v2928",
+                  "v3551",
                   "v3787",
                   "v4123"
                 ],
                 "pruned_nodes": [
+                  "v1508",
                   "v3228",
-                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -27786,8 +27786,8 @@
                   "male": 2
                 },
                 "attribute_counts": {
-                  "female | junior_senior": 1,
                   "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -27821,13 +27821,13 @@
                 "id": "AFC-sub-3",
                 "size": 4,
                 "nodes": [
+                  "v1508",
                   "v2928",
-                  "v3228",
                   "v3787",
                   "v4123"
                 ],
                 "pruned_nodes": [
-                  "v1508",
+                  "v3228",
                   "v3551",
                   "v4193"
                 ],
@@ -27836,8 +27836,8 @@
                   "male": 2
                 },
                 "attribute_counts": {
-                  "male | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -27847,13 +27847,13 @@
                 "size": 4,
                 "nodes": [
                   "v2928",
-                  "v3551",
+                  "v3228",
                   "v3787",
                   "v4123"
                 ],
                 "pruned_nodes": [
                   "v1508",
-                  "v3228",
+                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -27930,14 +27930,14 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
+                  "v1964",
                   "v2928",
                   "v3401",
-                  "v3551",
                   "v4123"
                 ],
                 "pruned_nodes": [
-                  "v1964",
                   "v3228",
+                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -27945,9 +27945,9 @@
                   "male": 2
                 },
                 "attribute_counts": {
+                  "female | junior_senior": 1,
                   "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
-                  "female | junior_senior": 1,
                   "male | junior_senior": 1
                 }
               },
@@ -27955,14 +27955,14 @@
                 "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
-                  "v1964",
                   "v2928",
                   "v3401",
+                  "v3551",
                   "v4123"
                 ],
                 "pruned_nodes": [
+                  "v1964",
                   "v3228",
-                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -27970,9 +27970,9 @@
                   "male": 2
                 },
                 "attribute_counts": {
-                  "female | junior_senior": 1,
                   "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "male | junior_senior": 1
                 }
               },
@@ -28090,13 +28090,13 @@
                 "size": 4,
                 "nodes": [
                   "v2928",
+                  "v3401",
                   "v3551",
-                  "v3787",
                   "v4123"
                 ],
                 "pruned_nodes": [
                   "v3228",
-                  "v3401",
+                  "v3787",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -28105,88 +28105,13 @@
                 },
                 "attribute_counts": {
                   "male | fresh_soph": 1,
-                  "female | junior_senior": 1,
                   "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "male | junior_senior": 1
                 }
               },
               {
                 "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v2928",
-                  "v3787",
-                  "v4123",
-                  "v4193"
-                ],
-                "pruned_nodes": [
-                  "v3228",
-                  "v3401",
-                  "v3551"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-3",
-                "size": 4,
-                "nodes": [
-                  "v2928",
-                  "v3228",
-                  "v3787",
-                  "v4123"
-                ],
-                "pruned_nodes": [
-                  "v3401",
-                  "v3551",
-                  "v4193"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1,
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-4",
-                "size": 4,
-                "nodes": [
-                  "v2928",
-                  "v3401",
-                  "v3551",
-                  "v4123"
-                ],
-                "pruned_nodes": [
-                  "v3228",
-                  "v3787",
-                  "v4193"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | fresh_soph": 1,
-                  "female | junior_senior": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-5",
                 "size": 4,
                 "nodes": [
                   "v2928",
@@ -28211,7 +28136,57 @@
                 }
               },
               {
-                "id": "AFC-sub-6",
+                "id": "AFC-sub-3",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3551",
+                  "v3787",
+                  "v4123"
+                ],
+                "pruned_nodes": [
+                  "v3228",
+                  "v3401",
+                  "v4193"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-4",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3787",
+                  "v4123",
+                  "v4193"
+                ],
+                "pruned_nodes": [
+                  "v3228",
+                  "v3401",
+                  "v3551"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "female | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-5",
                 "size": 4,
                 "nodes": [
                   "v2928",
@@ -28222,6 +28197,31 @@
                 "pruned_nodes": [
                   "v3551",
                   "v3787",
+                  "v4193"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-6",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3228",
+                  "v3787",
+                  "v4123"
+                ],
+                "pruned_nodes": [
+                  "v3401",
+                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -28300,6 +28300,31 @@
                 "nodes": [
                   "v2928",
                   "v3401",
+                  "v3551",
+                  "v4123"
+                ],
+                "pruned_nodes": [
+                  "v3228",
+                  "v3788",
+                  "v4193"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3401",
                   "v4123",
                   "v4193"
                 ],
@@ -28320,42 +28345,17 @@
                 }
               },
               {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v2928",
-                  "v3228",
-                  "v3401",
-                  "v4123"
-                ],
-                "pruned_nodes": [
-                  "v3551",
-                  "v3788",
-                  "v4193"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1,
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
                 "id": "AFC-sub-3",
                 "size": 4,
                 "nodes": [
                   "v2928",
                   "v3401",
-                  "v3551",
+                  "v3788",
                   "v4123"
                 ],
                 "pruned_nodes": [
                   "v3228",
-                  "v3788",
+                  "v3551",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -28374,13 +28374,13 @@
                 "size": 4,
                 "nodes": [
                   "v2928",
+                  "v3228",
                   "v3401",
-                  "v3788",
                   "v4123"
                 ],
                 "pruned_nodes": [
-                  "v3228",
                   "v3551",
+                  "v3788",
                   "v4193"
                 ],
                 "gender_counts": {
@@ -28389,8 +28389,8 @@
                 },
                 "attribute_counts": {
                   "male | fresh_soph": 1,
-                  "female | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
               }
@@ -28585,22 +28585,22 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1801",
                   "v2320",
+                  "v3884",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
-                  "v2994",
-                  "v3884"
+                  "v1801",
+                  "v2994"
                 ],
                 "gender_counts": {
                   "female": 2,
                   "male": 2
                 },
                 "attribute_counts": {
-                  "female | junior_senior": 1,
                   "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -28609,13 +28609,13 @@
                 "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
+                  "v1801",
                   "v2320",
-                  "v2994",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
-                  "v1801",
+                  "v2994",
                   "v3884"
                 ],
                 "gender_counts": {
@@ -28623,8 +28623,8 @@
                   "male": 2
                 },
                 "attribute_counts": {
-                  "male | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -28634,13 +28634,13 @@
                 "size": 4,
                 "nodes": [
                   "v2320",
-                  "v3884",
+                  "v2994",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
                   "v1801",
-                  "v2994"
+                  "v3884"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -28714,14 +28714,38 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1801",
-                  "v397",
+                  "v2320",
+                  "v3884",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
+                  "v1801",
+                  "v397"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1801",
                   "v2320",
-                  "v3884"
+                  "v4741",
+                  "v905"
+                ],
+                "pruned_nodes": [
+                  "v3884",
+                  "v397"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -28735,7 +28759,7 @@
                 }
               },
               {
-                "id": "AFC-sub-2",
+                "id": "AFC-sub-3",
                 "size": 4,
                 "nodes": [
                   "v3884",
@@ -28759,49 +28783,25 @@
                 }
               },
               {
-                "id": "AFC-sub-3",
-                "size": 4,
-                "nodes": [
-                  "v1801",
-                  "v2320",
-                  "v4741",
-                  "v905"
-                ],
-                "pruned_nodes": [
-                  "v3884",
-                  "v397"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | junior_senior": 1,
-                  "male | fresh_soph": 1,
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
                 "id": "AFC-sub-4",
                 "size": 4,
                 "nodes": [
-                  "v2320",
-                  "v3884",
+                  "v1801",
+                  "v397",
                   "v4741",
                   "v905"
                 ],
                 "pruned_nodes": [
-                  "v1801",
-                  "v397"
+                  "v2320",
+                  "v3884"
                 ],
                 "gender_counts": {
                   "female": 2,
                   "male": 2
                 },
                 "attribute_counts": {
-                  "male | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
@@ -28892,30 +28892,6 @@
                 "size": 4,
                 "nodes": [
                   "v2928",
-                  "v3228",
-                  "v3401",
-                  "v4123"
-                ],
-                "pruned_nodes": [
-                  "v1964",
-                  "v394"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1,
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-3",
-                "size": 4,
-                "nodes": [
-                  "v2928",
                   "v3401",
                   "v394",
                   "v4123"
@@ -28932,6 +28908,30 @@
                   "male | fresh_soph": 1,
                   "female | fresh_soph": 1,
                   "female | junior_senior": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-3",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3228",
+                  "v3401",
+                  "v4123"
+                ],
+                "pruned_nodes": [
+                  "v1964",
+                  "v394"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "female | fresh_soph": 1,
                   "male | junior_senior": 1
                 }
               }
@@ -29020,30 +29020,6 @@
                 "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
-                  "v2246",
-                  "v4123",
-                  "v4773",
-                  "v5562"
-                ],
-                "pruned_nodes": [
-                  "v1992",
-                  "v2620"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-3",
-                "size": 4,
-                "nodes": [
                   "v1992",
                   "v2620",
                   "v4123",
@@ -29062,6 +29038,30 @@
                   "female | junior_senior": 1,
                   "male | junior_senior": 1,
                   "male | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-3",
+                "size": 4,
+                "nodes": [
+                  "v2246",
+                  "v4123",
+                  "v4773",
+                  "v5562"
+                ],
+                "pruned_nodes": [
+                  "v1992",
+                  "v2620"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1
                 }
               },
               {
@@ -29149,30 +29149,6 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1992",
-                  "v4123",
-                  "v4773",
-                  "v5562"
-                ],
-                "pruned_nodes": [
-                  "v2620",
-                  "v5788"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
                   "v4123",
                   "v4773",
                   "v5562",
@@ -29194,16 +29170,16 @@
                 }
               },
               {
-                "id": "AFC-sub-3",
+                "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
                   "v1992",
-                  "v2620",
                   "v4123",
-                  "v4773"
+                  "v4773",
+                  "v5562"
                 ],
                 "pruned_nodes": [
-                  "v5562",
+                  "v2620",
                   "v5788"
                 ],
                 "gender_counts": {
@@ -29212,13 +29188,13 @@
                 },
                 "attribute_counts": {
                   "female | fresh_soph": 1,
-                  "female | junior_senior": 1,
                   "male | junior_senior": 1,
-                  "male | fresh_soph": 1
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1
                 }
               },
               {
-                "id": "AFC-sub-4",
+                "id": "AFC-sub-3",
                 "size": 4,
                 "nodes": [
                   "v2620",
@@ -29239,6 +29215,30 @@
                   "male | junior_senior": 1,
                   "male | fresh_soph": 1,
                   "female | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-4",
+                "size": 4,
+                "nodes": [
+                  "v1992",
+                  "v2620",
+                  "v4123",
+                  "v4773"
+                ],
+                "pruned_nodes": [
+                  "v5562",
+                  "v5788"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "male | junior_senior": 1,
+                  "male | fresh_soph": 1
                 }
               }
             ]
@@ -29302,30 +29302,6 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1992",
-                  "v4123",
-                  "v4773",
-                  "v6184"
-                ],
-                "pruned_nodes": [
-                  "v2620",
-                  "v5788"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
                   "v4123",
                   "v4773",
                   "v5788",
@@ -29347,17 +29323,17 @@
                 }
               },
               {
-                "id": "AFC-sub-3",
+                "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
                   "v1992",
-                  "v2620",
                   "v4123",
-                  "v4773"
+                  "v4773",
+                  "v6184"
                 ],
                 "pruned_nodes": [
-                  "v5788",
-                  "v6184"
+                  "v2620",
+                  "v5788"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -29365,13 +29341,13 @@
                 },
                 "attribute_counts": {
                   "female | fresh_soph": 1,
-                  "female | junior_senior": 1,
                   "male | junior_senior": 1,
-                  "male | fresh_soph": 1
+                  "male | fresh_soph": 1,
+                  "female | junior_senior": 1
                 }
               },
               {
-                "id": "AFC-sub-4",
+                "id": "AFC-sub-3",
                 "size": 4,
                 "nodes": [
                   "v2620",
@@ -29392,6 +29368,30 @@
                   "male | junior_senior": 1,
                   "male | fresh_soph": 1,
                   "female | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-4",
+                "size": 4,
+                "nodes": [
+                  "v1992",
+                  "v2620",
+                  "v4123",
+                  "v4773"
+                ],
+                "pruned_nodes": [
+                  "v5788",
+                  "v6184"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
+                  "male | junior_senior": 1,
+                  "male | fresh_soph": 1
                 }
               }
             ]
@@ -29457,12 +29457,12 @@
                 "nodes": [
                   "v2928",
                   "v3401",
-                  "v3500",
+                  "v394",
                   "v4123"
                 ],
                 "pruned_nodes": [
                   "v3228",
-                  "v394"
+                  "v3500"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -29505,12 +29505,12 @@
                 "nodes": [
                   "v2928",
                   "v3401",
-                  "v394",
+                  "v3500",
                   "v4123"
                 ],
                 "pruned_nodes": [
                   "v3228",
-                  "v3500"
+                  "v394"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -29586,30 +29586,6 @@
                 "nodes": [
                   "v2928",
                   "v3401",
-                  "v3500",
-                  "v4123"
-                ],
-                "pruned_nodes": [
-                  "v3228",
-                  "v4193"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "male | fresh_soph": 1,
-                  "female | fresh_soph": 1,
-                  "female | junior_senior": 1,
-                  "male | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v2928",
-                  "v3401",
                   "v4123",
                   "v4193"
                 ],
@@ -29629,7 +29605,7 @@
                 }
               },
               {
-                "id": "AFC-sub-3",
+                "id": "AFC-sub-2",
                 "size": 4,
                 "nodes": [
                   "v2928",
@@ -29649,6 +29625,30 @@
                   "male | fresh_soph": 1,
                   "female | junior_senior": 1,
                   "female | fresh_soph": 1,
+                  "male | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-3",
+                "size": 4,
+                "nodes": [
+                  "v2928",
+                  "v3401",
+                  "v3500",
+                  "v4123"
+                ],
+                "pruned_nodes": [
+                  "v3228",
+                  "v4193"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "male | fresh_soph": 1,
+                  "female | fresh_soph": 1,
+                  "female | junior_senior": 1,
                   "male | junior_senior": 1
                 }
               }
@@ -29915,12 +29915,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v2112",
+                  "v1770",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v1770"
+                  "v2112"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -29938,12 +29938,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v1770",
+                  "v2112",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v2112"
+                  "v1770"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -30016,12 +30016,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v273",
+                  "v1770",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v1770"
+                  "v273"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -30039,12 +30039,12 @@
                 "size": 4,
                 "nodes": [
                   "v1430",
-                  "v1770",
+                  "v273",
                   "v3736",
                   "v4975"
                 ],
                 "pruned_nodes": [
-                  "v273"
+                  "v1770"
                 ],
                 "gender_counts": {
                   "female": 2,
@@ -30218,29 +30218,6 @@
                 "size": 4,
                 "nodes": [
                   "v1634",
-                  "v2664",
-                  "v3995",
-                  "v6240"
-                ],
-                "pruned_nodes": [
-                  "v2320"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | junior_senior": 1,
-                  "male | junior_senior": 1,
-                  "female | fresh_soph": 1,
-                  "male | fresh_soph": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v1634",
                   "v2320",
                   "v2664",
                   "v3995"
@@ -30257,6 +30234,29 @@
                   "male | fresh_soph": 1,
                   "male | junior_senior": 1,
                   "female | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1634",
+                  "v2664",
+                  "v3995",
+                  "v6240"
+                ],
+                "pruned_nodes": [
+                  "v2320"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | junior_senior": 1,
+                  "male | junior_senior": 1,
+                  "female | fresh_soph": 1,
+                  "male | fresh_soph": 1
                 }
               }
             ]
@@ -30722,29 +30722,6 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1992",
-                  "v2295",
-                  "v4123",
-                  "v5562"
-                ],
-                "pruned_nodes": [
-                  "v5788"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
                   "v2295",
                   "v4123",
                   "v5562",
@@ -30762,6 +30739,29 @@
                   "male | junior_senior": 1,
                   "female | junior_senior": 1,
                   "female | fresh_soph": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1992",
+                  "v2295",
+                  "v4123",
+                  "v5562"
+                ],
+                "pruned_nodes": [
+                  "v5788"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "male | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "female | junior_senior": 1
                 }
               }
             ]
@@ -30823,29 +30823,6 @@
                 "id": "AFC-sub-1",
                 "size": 4,
                 "nodes": [
-                  "v1992",
-                  "v2295",
-                  "v4123",
-                  "v6184"
-                ],
-                "pruned_nodes": [
-                  "v5788"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
                   "v2295",
                   "v4123",
                   "v5788",
@@ -30862,6 +30839,29 @@
                   "male | fresh_soph": 1,
                   "male | junior_senior": 1,
                   "female | fresh_soph": 1,
+                  "female | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1992",
+                  "v2295",
+                  "v4123",
+                  "v6184"
+                ],
+                "pruned_nodes": [
+                  "v5788"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "male | fresh_soph": 1,
+                  "male | junior_senior": 1,
                   "female | junior_senior": 1
                 }
               }
@@ -30925,29 +30925,6 @@
                 "size": 4,
                 "nodes": [
                   "v1992",
-                  "v4123",
-                  "v4773",
-                  "v5562"
-                ],
-                "pruned_nodes": [
-                  "v3901"
-                ],
-                "gender_counts": {
-                  "female": 2,
-                  "male": 2
-                },
-                "attribute_counts": {
-                  "female | fresh_soph": 1,
-                  "male | junior_senior": 1,
-                  "male | fresh_soph": 1,
-                  "female | junior_senior": 1
-                }
-              },
-              {
-                "id": "AFC-sub-2",
-                "size": 4,
-                "nodes": [
-                  "v1992",
                   "v3901",
                   "v4123",
                   "v5562"
@@ -30963,6 +30940,29 @@
                   "female | fresh_soph": 1,
                   "male | fresh_soph": 1,
                   "male | junior_senior": 1,
+                  "female | junior_senior": 1
+                }
+              },
+              {
+                "id": "AFC-sub-2",
+                "size": 4,
+                "nodes": [
+                  "v1992",
+                  "v4123",
+                  "v4773",
+                  "v5562"
+                ],
+                "pruned_nodes": [
+                  "v3901"
+                ],
+                "gender_counts": {
+                  "female": 2,
+                  "male": 2
+                },
+                "attribute_counts": {
+                  "female | fresh_soph": 1,
+                  "male | junior_senior": 1,
+                  "male | fresh_soph": 1,
                   "female | junior_senior": 1
                 }
               }

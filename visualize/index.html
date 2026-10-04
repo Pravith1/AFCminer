@@ -34,6 +34,7 @@
           <option value="1">SubSet 1 (250 Nodes, 750 Edges)</option>
           <option value="2">SubSet 2 (500 Nodes, 2000 Edges)</option>
           <option value="3">SubSet 3 (750 Nodes, 3750 Edges)</option>
+          <option value="4">SubSet 4 (1000 Nodes, 6000 Edges)</option>
         </select>
       </div>
 
@@ -68,6 +69,14 @@
           <h2>Absolute Fair Clique</h2>
         </div>
         <div class="panel-criterion">Strict Parity: Count(G₁) = Count(G₂)</div>
+      </div>
+
+      <!-- Sub-clique Filter Toolbar -->
+      <div class="canvas-toolbar">
+        <span class="toolbar-label">View Filter:</span>
+        <div id="afc-filter-tabs" class="filter-tabs-container">
+          <button class="btn-tab active" data-tab="all">All Overlaid</button>
+        </div>
       </div>
 
       <!-- Render Area -->
@@ -131,6 +140,14 @@
           <h2>Weak Fair Clique</h2>
         </div>
         <div class="panel-criterion">Relaxed Fairness: min ≥ k, max - min ≤ δ</div>
+      </div>
+
+      <!-- Sub-clique Filter Toolbar -->
+      <div class="canvas-toolbar">
+        <span class="toolbar-label">View Filter:</span>
+        <div id="wfc-filter-tabs" class="filter-tabs-container">
+          <button class="btn-tab active" data-tab="all">All Overlaid</button>
+        </div>
       </div>
 
       <!-- Render Area -->

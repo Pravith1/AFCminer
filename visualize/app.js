@@ -12,6 +12,9 @@
   let currentMaximalCliqueId = null;
   let colorMode = "gender"; // "gender" | "multidim"
 
+  // Active Isolated Tab per panel ("all" | "AFC-sub-1" | ...)
+  let activeTabMap = { afc: "all", wfc: "all" };
+
   // --- DOM Elements ---
   const subsetSelect = document.getElementById("subset-select");
   const mcSelect = document.getElementById("mc-select");
@@ -21,6 +24,10 @@
   // SVG Viewports
   const svgAFC = document.getElementById("svg-afc");
   const svgWFC = document.getElementById("svg-wfc");
+
+  // Filter Tab Containers
+  const afcFilterTabs = document.getElementById("afc-filter-tabs");
+  const wfcFilterTabs = document.getElementById("wfc-filter-tabs");
 
   // --- Cohort Color Palette ---
   const COHORT_COLORS = {
@@ -32,16 +39,14 @@
     "male | grad_other": "#6366f1"         // Indigo
   };
 
-  // --- Sub-clique Color Palette (For Derived Fair Sub-cliques) ---
+  // --- Subtle Sub-clique Palette (Clean, Muted, Flat) ---
   const SUBCLIQUE_PALETTE = [
-    { fill: "rgba(6, 182, 212, 0.18)", stroke: "#06b6d4", text: "#67e8f9", glow: "rgba(6, 182, 212, 0.5)" },   // Cyan
-    { fill: "rgba(168, 85, 247, 0.18)", stroke: "#a855f7", text: "#c084fc", glow: "rgba(168, 85, 247, 0.5)" }, // Purple
-    { fill: "rgba(245, 158, 11, 0.18)", stroke: "#f59e0b", text: "#fbbf24", glow: "rgba(245, 158, 11, 0.5)" },  // Amber
-    { fill: "rgba(16, 185, 129, 0.18)", stroke: "#10b981", text: "#34d399", glow: "rgba(16, 185, 129, 0.5)" },  // Emerald
-    { fill: "rgba(244, 63, 94, 0.18)", stroke: "#f43f5e", text: "#fb7185", glow: "rgba(244, 63, 94, 0.5)" },   // Rose
-    { fill: "rgba(56, 189, 248, 0.18)", stroke: "#38bdf8", text: "#7dd3fc", glow: "rgba(56, 189, 248, 0.5)" },  // Sky
-    { fill: "rgba(236, 72, 153, 0.18)", stroke: "#ec4899", text: "#f472b6", glow: "rgba(236, 72, 153, 0.5)" },  // Pink
-    { fill: "rgba(234, 179, 8, 0.18)", stroke: "#eab308", text: "#fde047", glow: "rgba(234, 179, 8, 0.5)" },   // Yellow
+    { fill: "rgba(6, 182, 212, 0.08)", stroke: "rgba(6, 182, 212, 0.6)", text: "#67e8f9" },   // Cyan
+    { fill: "rgba(168, 85, 247, 0.08)", stroke: "rgba(168, 85, 247, 0.6)", text: "#c084fc" }, // Purple
+    { fill: "rgba(245, 158, 11, 0.08)", stroke: "rgba(245, 158, 11, 0.6)", text: "#fbbf24" },  // Amber
+    { fill: "rgba(16, 185, 129, 0.08)", stroke: "rgba(16, 185, 129, 0.6)", text: "#34d399" },  // Emerald
+    { fill: "rgba(244, 63, 94, 0.08)", stroke: "rgba(244, 63, 94, 0.6)", text: "#fb7185" },   // Rose
+    { fill: "rgba(56, 189, 248, 0.08)", stroke: "rgba(56, 189, 248, 0.6)", text: "#7dd3fc" },  // Sky
   ];
 
   function getNodeColor(nodeObj) {
@@ -154,12 +159,14 @@
     // Bind Event Listeners
     subsetSelect.addEventListener("change", (e) => {
       currentSubsetId = e.target.value;
+      activeTabMap = { afc: "all", wfc: "all" };
       populateMaximalCliqueDropdown();
       renderCurrentSelection();
     });
 
     mcSelect.addEventListener("change", (e) => {
       currentMaximalCliqueId = e.target.value;
+      activeTabMap = { afc: "all", wfc: "all" };
       renderCurrentSelection();
     });
 
@@ -239,6 +246,9 @@
       };
     });
 
+    // Update Filter Toolbar Tabs above SVG
+    renderFilterToolbar(type, derivedCliques);
+
     // 2. Create SVG Layer Groups (Order: Hulls -> Edges -> Nodes)
     const hullGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
     const edgeGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -248,21 +258,29 @@
     svgElement.appendChild(edgeGroup);
     svgElement.appendChild(nodeGroup);
 
+    // Filter derived cliques if a specific tab is active
+    const activeTab = activeTabMap[type] || "all";
+
     // 3. Draw Sub-clique Convex Hull / Bubble Overlays for each derived fair clique
     derivedCliques.forEach((subItem, idx) => {
       const style = SUBCLIQUE_PALETTE[idx % SUBCLIQUE_PALETTE.length];
       const subPoints = subItem.nodes.map(nid => nodePositions[nid]).filter(Boolean);
 
+      // Skip rendering if tab filter isolates another subclique
+      if (activeTab !== "all" && activeTab !== subItem.id) {
+        return;
+      }
+
       const pathStr = generateSubcliqueBlobPath(subPoints, 24);
       if (pathStr) {
+        // Hull Path (Subtle, clean fill and stroke without center badges)
         const hullPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
         hullPath.setAttribute("d", pathStr);
         hullPath.setAttribute("class", "svg-subclique-hull");
         hullPath.setAttribute("fill", style.fill);
         hullPath.setAttribute("stroke", style.stroke);
-        hullPath.setAttribute("stroke-width", "2.5");
+        hullPath.setAttribute("stroke-width", "1.8");
         hullPath.setAttribute("data-subclique-id", subItem.id);
-        hullPath.setAttribute("data-panel", type);
 
         // Hover interaction on hull
         hullPath.addEventListener("mouseenter", () => highlightSubclique(type, subItem.id, idx));
@@ -303,6 +321,13 @@
         const edgeKey = u < v ? `${u}-${v}` : `${v}-${u}`;
         const matchingSubIdxs = edgeSubcliquesMap[edgeKey] || [];
 
+        // Check if edge is in active tab filter
+        let isInActiveTab = true;
+        if (activeTab !== "all") {
+          const activeSubIdx = derivedCliques.findIndex(s => s.id === activeTab);
+          isInActiveTab = matchingSubIdxs.includes(activeSubIdx);
+        }
+
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", nodePositions[u].x);
         line.setAttribute("y1", nodePositions[u].y);
@@ -311,16 +336,19 @@
         line.setAttribute("data-u", u);
         line.setAttribute("data-v", v);
 
-        if (matchingSubIdxs.length > 0) {
-          // Valid edge within at least one derived fair sub-clique
+        if (matchingSubIdxs.length > 0 && isInActiveTab) {
+          // Clean solid edge within derived fair sub-clique
           const firstSubStyle = SUBCLIQUE_PALETTE[matchingSubIdxs[0] % SUBCLIQUE_PALETTE.length];
           line.setAttribute("class", "svg-edge svg-edge-valid");
           line.setAttribute("stroke", firstSubStyle.stroke);
           line.setAttribute("data-subcliques", matchingSubIdxs.join(","));
         } else {
-          // Broken edge (Does NOT belong to any derived fair sub-clique)
+          // Broken or filtered edge
           line.setAttribute("class", "svg-edge svg-edge-broken");
           line.setAttribute("data-broken", "true");
+          if (activeTab !== "all" && !isInActiveTab) {
+            line.style.opacity = "0.05";
+          }
         }
 
         // Broken Edge Hover Tooltip
@@ -336,20 +364,25 @@
       }
     }
 
-    // 6. Draw Nodes for ALL maximal clique members
+    // 6. Draw Nodes for ALL maximal clique members (Clean, flat vector circles)
     cliqueNodeIds.forEach((nid) => {
       const nObj = nodesLookup[nid];
       const pos = nodePositions[nid];
       const memberSubIdxs = nodeSubcliquesMap[nid] || [];
-      const isAssigned = memberSubIdxs.length > 0;
+
+      let isNodeInActiveTab = true;
+      if (activeTab !== "all") {
+        const activeSubIdx = derivedCliques.findIndex(s => s.id === activeTab);
+        isNodeInActiveTab = memberSubIdxs.includes(activeSubIdx);
+      }
 
       const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.setAttribute("class", `svg-node-group ${isAssigned ? "" : "svg-node-unassigned"}`);
+      g.setAttribute("class", `svg-node-group ${isNodeInActiveTab ? "" : "dimmed"}`);
       g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
       g.setAttribute("data-node-id", nid);
       g.setAttribute("data-subcliques", memberSubIdxs.join(","));
 
-      // Outer circle
+      // Outer circle (Flat color, clean white border)
       const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       circle.setAttribute("r", 18);
       const color = getNodeColor(nObj);
@@ -377,6 +410,43 @@
     updatePanelFooter(type, mc, derivedCliques, nodesLookup);
   }
 
+  // --- Render Filter Toolbar Tabs Above SVG Canvases ---
+  function renderFilterToolbar(type, derivedCliques) {
+    const container = (type === "afc") ? afcFilterTabs : wfcFilterTabs;
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const activeTab = activeTabMap[type] || "all";
+
+    // "All Overlaid" Tab
+    const btnAll = document.createElement("button");
+    btnAll.className = `btn-tab ${activeTab === "all" ? "active" : ""}`;
+    btnAll.setAttribute("data-tab", "all");
+    btnAll.innerHTML = `<span>All Overlaid</span>`;
+    btnAll.addEventListener("click", () => {
+      activeTabMap[type] = "all";
+      renderCurrentSelection();
+    });
+    container.appendChild(btnAll);
+
+    // Individual Sub-clique Tabs (Sub-clique S1, S2, S3...)
+    derivedCliques.forEach((subItem, idx) => {
+      const style = SUBCLIQUE_PALETTE[idx % SUBCLIQUE_PALETTE.length];
+      const btn = document.createElement("button");
+      btn.className = `btn-tab ${activeTab === subItem.id ? "active" : ""}`;
+      btn.setAttribute("data-tab", subItem.id);
+      btn.style.color = activeTab === subItem.id ? style.text : "";
+      btn.innerHTML = `<span style="color:${style.stroke}; font-weight:800;">●</span> Sub-clique S${idx + 1} (${subItem.size} Nodes)`;
+      
+      btn.addEventListener("click", () => {
+        activeTabMap[type] = subItem.id;
+        renderCurrentSelection();
+      });
+      container.appendChild(btn);
+    });
+  }
+
   // --- Update Panel KPI Cards & Derived Sub-clique Breakdown List ---
   function updatePanelFooter(type, mc, derivedCliques, nodesLookup) {
     const isAFC = (type === "afc");
@@ -396,7 +466,7 @@
     // Number of derived subcliques
     kpiSubcliques.textContent = derivedCliques.length;
 
-    // Node coverage: Unique nodes in derived fair subcliques / total nodes
+    // Node coverage
     const coveredNodesSet = new Set();
     derivedCliques.forEach(sub => sub.nodes.forEach(nid => coveredNodesSet.add(nid)));
     kpiCoverage.textContent = `${coveredNodesSet.size} / ${mc.size}`;
@@ -447,7 +517,7 @@
         <div class="subclique-chip-left">
           <div class="subclique-color-dot" style="background: ${style.stroke}; color: ${style.stroke};"></div>
           <div>
-            <span class="subclique-chip-name">Sub-clique #${idx + 1} (${subItem.size} Nodes)</span>
+            <span class="subclique-chip-name">Sub-clique S${idx + 1} (${subItem.size} Nodes)</span>
             <div class="subclique-chip-nodes">Nodes: ${subItem.nodes.join(", ")}</div>
           </div>
         </div>
@@ -458,6 +528,10 @@
 
       card.addEventListener("mouseenter", () => highlightSubclique(type, subItem.id, idx));
       card.addEventListener("mouseleave", () => resetSubcliqueHighlights(type));
+      card.addEventListener("click", () => {
+        activeTabMap[type] = subItem.id;
+        renderCurrentSelection();
+      });
 
       subcliquesList.appendChild(card);
     });
@@ -569,7 +643,7 @@
     if (memberSubIdxs.length === 0) {
       subcliquesStr = `<span style="color: var(--accent-danger);">Not in any derived ${type.toUpperCase()} clique</span>`;
     } else {
-      const names = memberSubIdxs.map(idx => `Sub-clique #${idx + 1}`).join(", ");
+      const names = memberSubIdxs.map(idx => `Sub-clique S${idx + 1}`).join(", ");
       subcliquesStr = `<span style="color: #10b981;">Member of ${names}</span>`;
     }
 

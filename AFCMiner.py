@@ -18,17 +18,14 @@ def FairnessFilter(X1,X2,attributes,C):
     return True
 #This code is to filter the cliques based on the parameter K and delta so that it filters weak fair clique 
 #instead of absolute fair cliquers
-def WFC_FairnessFilter(X, attributes, C, k=1, delta=1):
+def WFC_FairnessFilter(X,attributes,C,k=1,delta=1):
     counts = [sum(C[v][a] for v in X) for a in attributes]
     if not counts:
         return False
-        
-    min_cnt = min(counts)
-    max_cnt = max(counts)
-    
-    if min_cnt < k or (max_cnt - min_cnt) > delta:
+    min_cnt=min(counts)
+    max_cnt=max(counts)
+    if min_cnt<k or (max_cnt-min_cnt)>delta:
         return False
-        
     return True
 #the below fucntion is used to generate powerset as given in the paper
 def AttributedConceptsDerivation(X):
