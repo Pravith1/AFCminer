@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AFCMiner - Maximal Clique Derivation: AFC vs WFC</title>
-  
+
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- Top Navigation & Control Header -->
@@ -28,7 +32,7 @@
     <!-- Central Dropdowns Dock -->
     <div class="header-controls">
       <!-- SubSet Selection -->
-      <div class="select-group">
+      <div class="select-group select-group-subset">
         <label for="subset-select">Graph SubSet</label>
         <select id="subset-select">
           <option value="1">SubSet 1 (250 Nodes, 750 Edges)</option>
@@ -47,8 +51,8 @@
       </div>
 
       <!-- Demographic Color Mode -->
-      <div class="select-group">
-        <label for="color-mode-select">Color Mode</label>
+      <div class="select-group select-group-color">
+        <label for="color-mode-select">🎨 Color Mode</label>
         <select id="color-mode-select">
           <option value="gender">Gender (Female / Male)</option>
           <option value="multidim">Gender & Year Cohort</option>
@@ -59,7 +63,7 @@
 
   <!-- Main Split-Screen Comparison View -->
   <main class="split-viewport">
-    
+
     <!-- LEFT PANEL: Absolute Fair Clique (AFC) -->
     <section class="clique-panel panel-afc" id="panel-afc">
       <!-- Panel Header -->
@@ -207,9 +211,17 @@
   <!-- Interactive Node Hover Tooltip -->
   <div id="tooltip" class="tooltip" style="display: none;"></div>
 
-  <!-- Load Pre-generated Data File -->
+  <!-- Load Pre-generated Datasets -->
+  <!-- Dataset 1: Multidimensional (Gender & Year Cohort) -->
+  <script src="network_data1.js"></script>
+  <script>window.GRAPH_DATA_MULTIDIM = window.GRAPH_DATA;</script>
+
+  <!-- Dataset 2: Single Attribute (Gender Only) -->
   <script src="network_data.js"></script>
+  <script>window.GRAPH_DATA_GENDER = window.GRAPH_DATA;</script>
+
   <!-- Application Logic -->
   <script src="app.js"></script>
 </body>
+
 </html>
