@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFCMiner - Maximal Clique Derivation: AFC vs WFC</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation & Control Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="logo-icon">FC</div>
+      <div>
+        <h1 class="header-title">AFCMiner Visualizer</h1>
+        <div class="header-subtitle">Maximal Clique Breakdown & Fair Clique Formation</div>
+      </div>
+    </div>
+
+    <!-- Central Dropdowns Dock -->
+    <div class="header-controls">
+      <!-- SubSet Selection -->
+      <div class="select-group">
+        <label for="subset-select">Graph SubSet</label>
+        <select id="subset-select">
+          <option value="1">SubSet 1 (250 Nodes, 750 Edges)</option>
+          <option value="2">SubSet 2 (500 Nodes, 2000 Edges)</option>
+          <option value="3">SubSet 3 (750 Nodes, 3750 Edges)</option>
+        </select>
+      </div>
+
+      <!-- Maximal Clique Dropdown Selector -->
+      <div class="select-group select-group-mc">
+        <label for="mc-select">Select Maximal Clique concept</label>
+        <select id="mc-select">
+          <option value="">Loading Maximal Cliques...</option>
+        </select>
+      </div>
+
+      <!-- Demographic Color Mode -->
+      <div class="select-group">
+        <label for="color-mode-select">Color Mode</label>
+        <select id="color-mode-select">
+          <option value="gender">Gender (Female / Male)</option>
+          <option value="multidim">Gender & Year Cohort</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Split-Screen Comparison View -->
+  <main class="split-viewport">
+    
+    <!-- LEFT PANEL: Absolute Fair Clique (AFC) -->
+    <section class="clique-panel panel-afc" id="panel-afc">
+      <!-- Panel Header -->
+      <div class="panel-header">
+        <div class="panel-title-area">
+          <span class="badge badge-afc">AFC</span>
+          <h2>Absolute Fair Clique</h2>
+        </div>
+        <div class="panel-criterion">Strict Parity: Count(G₁) = Count(G₂)</div>
+      </div>
+
+      <!-- Render Area -->
+      <div class="graph-canvas-container">
+        <svg id="svg-afc" class="clique-svg" viewBox="0 0 500 400"></svg>
+        <div class="canvas-watermark" id="watermark-afc">AFC Derivation</div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="panel-footer">
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-num" id="afc-kpi-size">- / -</div>
+            <div class="kpi-sub">Retained / Initial Nodes</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-num" id="afc-kpi-pruned">0</div>
+            <div class="kpi-sub">Nodes Pruned</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-num" id="afc-kpi-status">-</div>
+            <div class="kpi-sub">Fairness Status</div>
+          </div>
+        </div>
+
+        <!-- Gender Parity Progress Bar -->
+        <div class="parity-card">
+          <div class="parity-title">
+            <span>Demographic Parity</span>
+            <span id="afc-parity-ratio" class="parity-val">-</span>
+          </div>
+          <div class="progress-track">
+            <div id="afc-female-bar" class="progress-bar bar-female" style="width: 50%;"></div>
+            <div id="afc-male-bar" class="progress-bar bar-male" style="width: 50%;"></div>
+          </div>
+          <div class="parity-legend">
+            <span class="leg-female">● Female: <b id="afc-cnt-female">0</b></span>
+            <span class="leg-male">● Male: <b id="afc-cnt-male">0</b></span>
+          </div>
+        </div>
+
+        <!-- Pruned Nodes Log -->
+        <div class="pruned-log-box">
+          <div class="pruned-log-title">Pruned Nodes Log</div>
+          <div id="afc-pruned-list" class="pruned-tags-container">
+            <span class="tag-none">No nodes pruned</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Weak Fair Clique (WFC) -->
+    <section class="clique-panel panel-wfc" id="panel-wfc">
+      <!-- Panel Header -->
+      <div class="panel-header">
+        <div class="panel-title-area">
+          <span class="badge badge-wfc">WFC</span>
+          <h2>Weak Fair Clique</h2>
+        </div>
+        <div class="panel-criterion">Relaxed Fairness: min ≥ k, max - min ≤ δ</div>
+      </div>
+
+      <!-- Render Area -->
+      <div class="graph-canvas-container">
+        <svg id="svg-wfc" class="clique-svg" viewBox="0 0 500 400"></svg>
+        <div class="canvas-watermark" id="watermark-wfc">WFC Derivation</div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="panel-footer">
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-num" id="wfc-kpi-size">- / -</div>
+            <div class="kpi-sub">Retained / Initial Nodes</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-num" id="wfc-kpi-pruned">0</div>
+            <div class="kpi-sub">Nodes Pruned</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-num" id="wfc-kpi-status">-</div>
+            <div class="kpi-sub">Fairness Status</div>
+          </div>
+        </div>
+
+        <!-- Gender Parity Progress Bar -->
+        <div class="parity-card">
+          <div class="parity-title">
+            <span>Demographic Balance</span>
+            <span id="wfc-parity-ratio" class="parity-val">-</span>
+          </div>
+          <div class="progress-track">
+            <div id="wfc-female-bar" class="progress-bar bar-female" style="width: 50%;"></div>
+            <div id="wfc-male-bar" class="progress-bar bar-male" style="width: 50%;"></div>
+          </div>
+          <div class="parity-legend">
+            <span class="leg-female">● Female: <b id="wfc-cnt-female">0</b></span>
+            <span class="leg-male">● Male: <b id="wfc-cnt-male">0</b></span>
+          </div>
+        </div>
+
+        <!-- Pruned Nodes Log -->
+        <div class="pruned-log-box">
+          <div class="pruned-log-title">Pruned Nodes Log</div>
+          <div id="wfc-pruned-list" class="pruned-tags-container">
+            <span class="tag-none">No nodes pruned</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Node Hover Tooltip -->
+  <div id="tooltip" class="tooltip" style="display: none;"></div>
+
+  <!-- Load Pre-generated Data File -->
+  <script src="network_data.js"></script>
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
