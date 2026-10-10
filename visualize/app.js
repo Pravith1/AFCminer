@@ -35,7 +35,7 @@
     "female | junior_senior": "#f43f5e",   // Rose / Coral
     "female | grad_other": "#d946ef",      // Magenta
     "male | fresh_soph": "#3b82f6",        // Vibrant Blue
-    "male | junior_senior": "#06b6d4",     // Cyan
+    "male | junior_senior": "#1d4ed8",     // Dark Blue
     "male | grad_other": "#6366f1"         // Indigo
   };
 
@@ -50,10 +50,11 @@
   ];
 
   function getNodeColor(nodeObj) {
+    const isFemale = (nodeObj.gender === "female" || nodeObj.gender === "f");
     if (colorMode === "multidim") {
-      return COHORT_COLORS[nodeObj.attribute] || (nodeObj.gender === "female" ? "#ec4899" : "#3b82f6");
+      return COHORT_COLORS[nodeObj.attribute] || (isFemale ? "#ec4899" : "#3b82f6");
     }
-    return nodeObj.gender === "female" ? "#ec4899" : "#3b82f6";
+    return isFemale ? "#ec4899" : "#3b82f6";
   }
 
   // --- Geometry Helpers for Smooth SVG Convex Hulls & Blobs ---
@@ -147,12 +148,22 @@
     return pathStr;
   }
 
+  // --- Switch Active Dataset (Gender vs Multidim Cohort) ---
+  function updateActiveDataset() {
+    if (colorMode === "gender") {
+      graphData = window.GRAPH_DATA_GENDER || window.GRAPH_DATA;
+    } else {
+      graphData = window.GRAPH_DATA_MULTIDIM || window.GRAPH_DATA;
+    }
+  }
+
   // --- Initialization ---
   function init() {
-    if (window.GRAPH_DATA) {
-      graphData = window.GRAPH_DATA;
-    } else {
-      console.error("GRAPH_DATA not loaded");
+    colorMode = colorModeSelect.value || "gender";
+    updateActiveDataset();
+
+    if (!graphData) {
+      console.error("GRAPH_DATA not loaded. Check script imports for network_data.js and network_data1.js.");
       return;
     }
 
@@ -167,11 +178,15 @@
     mcSelect.addEventListener("change", (e) => {
       currentMaximalCliqueId = e.target.value;
       activeTabMap = { afc: "all", wfc: "all" };
+      mcSelect.title = mcSelect.options[mcSelect.selectedIndex]?.textContent || "";
       renderCurrentSelection();
     });
 
     colorModeSelect.addEventListener("change", (e) => {
       colorMode = e.target.value;
+      updateActiveDataset();
+      activeTabMap = { afc: "all", wfc: "all" };
+      populateMaximalCliqueDropdown();
       renderCurrentSelection();
     });
 
@@ -196,13 +211,18 @@
       let afcStatus = mc.afc.is_already_fair ? "Intact Fair" : `Split into ${afcCount} Cliques`;
       let wfcStatus = mc.wfc.is_already_fair ? "Intact Fair" : `Split into ${wfcCount} Cliques`;
       
-      option.textContent = `${mc.name} - ${mc.gender_counts.female || 0}F / ${mc.gender_counts.male || 0}M (AFC: ${afcStatus} | WFC: ${wfcStatus})`;
+      const fMC = (mc.gender_counts.female || 0) + (mc.gender_counts.f || 0);
+      const mMC = (mc.gender_counts.male || 0) + (mc.gender_counts.m || 0);
+      
+      option.textContent = `${mc.name} - ${fMC}F / ${mMC}M (AFC: ${afcStatus} | WFC: ${wfcStatus})`;
+      option.title = option.textContent;
       mcSelect.appendChild(option);
     });
 
     if (subsetObj.maximal_cliques.length > 0) {
       currentMaximalCliqueId = subsetObj.maximal_cliques[0].id;
       mcSelect.value = currentMaximalCliqueId;
+      mcSelect.title = mcSelect.options[mcSelect.selectedIndex]?.textContent || "";
     }
   }
 
@@ -482,8 +502,8 @@
     }
 
     // Demographic breakdown of Maximal Clique
-    let fCount = mc.gender_counts.female || 0;
-    let mCount = mc.gender_counts.male || 0;
+    let fCount = (mc.gender_counts.female || 0) + (mc.gender_counts.f || 0);
+    let mCount = (mc.gender_counts.male || 0) + (mc.gender_counts.m || 0);
     cntFemale.textContent = fCount;
     cntMale.textContent = mCount;
 
@@ -510,8 +530,8 @@
       card.className = "subclique-chip";
       card.setAttribute("data-subclique-id", subItem.id);
 
-      const fSub = subItem.gender_counts.female || 0;
-      const mSub = subItem.gender_counts.male || 0;
+      const fSub = (subItem.gender_counts.female || 0) + (subItem.gender_counts.f || 0);
+      const mSub = (subItem.gender_counts.male || 0) + (subItem.gender_counts.m || 0);
 
       card.innerHTML = `
         <div class="subclique-chip-left">
@@ -647,9 +667,10 @@
       subcliquesStr = `<span style="color: #10b981;">Member of ${names}</span>`;
     }
 
+    const genderStr = ((nodeObj.gender === 'f' || nodeObj.gender === 'female') ? 'FEMALE' : 'MALE');
     tooltip.innerHTML = `
       <div class="tooltip-title">User ${nodeObj.id}</div>
-      <div>Gender: <b>${nodeObj.gender.toUpperCase()}</b></div>
+      <div>Gender: <b>${genderStr}</b></div>
       <div>Cohort: <b>${nodeObj.year_group}</b></div>
       <div>Degree: <b>${nodeObj.degree}</b></div>
       <div style="margin-top: 4px; font-weight: 700; font-size: 0.75rem;">
@@ -664,10 +685,13 @@
     const uObj = nodesLookup[u];
     const vObj = nodesLookup[v];
 
+    const uGenderStr = ((uObj.gender === 'f' || uObj.gender === 'female') ? 'FEMALE' : 'MALE');
+    const vGenderStr = ((vObj.gender === 'f' || vObj.gender === 'female') ? 'FEMALE' : 'MALE');
+
     tooltip.innerHTML = `
       <div class="tooltip-title" style="color: #f87171;">Broken Fair Edge (${u} ⟷ ${v})</div>
-      <div>Node ${u}: <b>${uObj.gender.toUpperCase()}</b></div>
-      <div>Node ${v}: <b>${vObj.gender.toUpperCase()}</b></div>
+      <div>Node ${u}: <b>${uGenderStr}</b></div>
+      <div>Node ${v}: <b>${vGenderStr}</b></div>
       <div style="margin-top: 4px; font-size: 0.73rem; color: #fca5a5; max-width: 200px;">
         ⚠️ Pair cannot co-exist in any derived fair clique due to demographic parity requirements.
       </div>

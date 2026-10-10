@@ -120,7 +120,7 @@ def extract_maximal_clique_derivations(V, node_attribute_set, R, k=1, delta=10):
     maximal_cliques.sort(key=lambda x: (-len(x["nodes"]), x["nodes"]))
     return maximal_cliques
 
-def build_visualization_payload():
+def build_visualization_payload(attribute_type="multidim_gender_year", output_prefix="network_data", delta=2):
     dataset_dir = os.path.join(BASE_DIR, DATASET_FOLDER)
     file_path = os.path.join(dataset_dir, DATASET_FILE)
     mat_data = scipy.io.loadmat(file_path)
@@ -130,26 +130,27 @@ def build_visualization_payload():
         "meta": {
             "title": "Absolute Fair Clique (AFC) vs Weak Fair Clique (WFC) Derivation Visualizer",
             "k": 1,
-            "delta": 2,
+            "delta": delta,
+            "attribute_type": attribute_type,
             "dataset": DATASET_FILE
         },
         "subsets": {}
     }
 
-    print("Pre-generating subsets and mining maximal cliques + derivations...")
+    print(f"Pre-generating subsets and mining maximal cliques for {attribute_type} -> {output_prefix}...")
     for idx, size in enumerate(SUBSET_SIZES, start=1):
         print(f"\n--- Processing SubSet {idx} ({size} nodes) ---")
         nodes, attribute_columns, combined_data = load_facebook100_data(
             mat_filename=DATASET_FILE,
             folder_name=dataset_dir,
             max_nodes=size,
-            attribute_type="multidim_gender_year",
+            attribute_type=attribute_type,
             granularity=2
         )
         edges, node_attributes = split_preprocessed_data(nodes, combined_data)
 
         # Mine maximal cliques with AFC / WFC derivations
-        mc_raw_list = extract_maximal_clique_derivations(nodes, attribute_columns, combined_data, k=1, delta=10)
+        mc_raw_list = extract_maximal_clique_derivations(nodes, attribute_columns, combined_data, k=1, delta=delta)
 
         # Calculate degrees
         degrees = {n: 0 for n in nodes}
@@ -260,19 +261,29 @@ def build_visualization_payload():
 
     # Save as JSON file
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(script_dir, "network_data.json")
+    json_path = os.path.join(script_dir, f"{output_prefix}.json")
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(data_payload, f, indent=2)
     print(f"\nSaved {json_path} (size: {os.path.getsize(json_path):,} bytes)")
 
-    # Also save as network_data.js so index.html works directly without CORS issues
-    js_path = os.path.join(script_dir, "network_data.js")
+    # Also save as JS file so index.html works directly without CORS issues
+    js_path = os.path.join(script_dir, f"{output_prefix}.js")
     with open(js_path, "w", encoding="utf-8") as f:
-        f.write("window.GRAPH_DATA = ")
+        var_export = "window.GRAPH_DATA_GENDER = window.GRAPH_DATA = " if output_prefix == "network_data1" else "window.GRAPH_DATA_MULTIDIM = window.GRAPH_DATA = "
+        f.write(var_export)
         json.dump(data_payload, f)
         f.write(";\n")
     print(f"Saved {js_path} (size: {os.path.getsize(js_path):,} bytes)")
 
 if __name__ == "__main__":
-    build_visualization_payload()
+    target = sys.argv[1] if len(sys.argv) > 1 else "multidim"
+    if target in ["gender", "1", "data1"]:
+        build_visualization_payload(attribute_type="gender", output_prefix="network_data1", delta=2)
+    elif target in ["multidim", "0", "data"]:
+        build_visualization_payload(attribute_type="multidim_gender_year", output_prefix="network_data", delta=2)
+    elif target == "all":
+        build_visualization_payload(attribute_type="multidim_gender_year", output_prefix="network_data", delta=2)
+        build_visualization_payload(attribute_type="gender", output_prefix="network_data1", delta=2)
+    else:
+        build_visualization_payload(attribute_type="multidim_gender_year", output_prefix="network_data", delta=2)
 
